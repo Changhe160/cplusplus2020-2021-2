@@ -1,0 +1,811 @@
+%--------------------
+
+%#####################################
+\section{函数模板}
+%#####################################
+
+
+
+%-------------------------------------
+
+\begin{frame}[fragile]{7.1~函数模板}
+\vspace{-4mm}
+\begin{block}{泛型编程}
+\begin{itemize}
+  \item 一种采用与数据类型无关的方式编写代码的方法，是\alert{代码重用}的重要手段。\onslide<2->{如何设计一个通用的排序算法?}
+  \item <3->\alert{模板}是泛型编程的基础，它将数据类型参数化，为数据结构和算法的\alert{抽象}提供\alert{通用的代码}解决方案
+\end{itemize}
+
+\end{block}
+
+\uncover<3->{请观察下面两组代码：}
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}<3->{\texttt{getMax}函数定义一}
+\vspace{-1.5mm}\begin{lstlisting}
+const int& getMax(const int &a, const int &b){
+    return a>b ? a : b;
+}
+\end{lstlisting}\vspace{-1.5mm}
+\end{blueblock}
+\vspace{-2mm}
+\begin{blueblock}<3->{\texttt{getMax}函数定义二}
+\vspace{-1.5mm}\begin{lstlisting}
+const string& getMax(const string &a, const string &b){
+    return a>b ? a : b;
+}
+\end{lstlisting}\vspace{-1.5mm}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{greenblock}<4->{问题}
+\begin{itemize}
+  \item 两个函数定义有什么异同？
+  \item <5-> 有什么办法可以简化？
+\end{itemize}
+
+\end{greenblock}
+
+\end{columns}
+
+\end{frame}
+
+%-------------------------------------
+\subsection{定义函数模板}
+%-------------------------------------
+
+\begin{frame}[fragile]{7.1.1~定义函数模板}
+\vspace{-3mm}
+定义\alert{函数模板}来实现\alert{一类}函数的\alert{通用}代码解决方案，即实现某种功能的一类函数的抽象：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{getMax}函数模板定义}
+
+\begin{lstlisting}[moreemph={T}]
+const int& getMax(const int &a, const int &b){
+    return a>b ? a : b;
+}
+\end{lstlisting}
+\begin{tikzpicture}[overlay]
+\node at (7., 0.3) [rectangle, draw=blue!50, fill=blue!20, text=blue!70] {类型参数化};
+\draw[->,blue,line width =1pt] (1.4,1.4) -- (3.1,-0.4);
+\draw[->,blue,line width =1pt] (4.3,1.4) -- (3.2,-0.4);
+\draw[->,blue,line width =1pt] (6.5,1.4) -- (3.3,-0.4);
+\end{tikzpicture}
+\begin{lstlisting}[moreemph={T}]
+template <typename T>
+const T& getMax(const T &a, const T &b){
+    return a>b ? a : b;
+}
+\end{lstlisting}
+
+\end{blueblock}
+
+\begin{redblock}<3->{注意}
+\begin{itemize}
+  \item 注意不要混淆\alert{模板参数}和\alert{函数形参}的概念
+  \item 模板的声明和定义应放在同一个头文件里
+\end{itemize}
+\end{redblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}<2->{说明}
+$\bullet$ 模板的定义以关键字~\alert{\texttt{template}}~开始\\
+$\bullet$ 模板参数列表放在一对\alert{尖括号}里面\\
+$\bullet$ 每一个参数前面用\\\alert{\texttt{typename}}~或~\alert{\texttt{class}}~声明\\
+$\bullet$ 列表含有多个模板参数则参数之间用\alert{逗号}分开
+\end{yellowblock}
+
+\end{columns}
+\end{frame}
+
+%-------------------------------------
+\subsection{实例化函数模板}
+%-------------------------------------
+
+\begin{frame}[fragile]{7.1.2~实例化函数模板\small{~---~模板参数推断}}
+
+如何使用函数模板？ \onslide<2->{实例化模板函数，需要提供具体的\alert{数据类型或值}}
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}<3->{实例化方法一：隐式推断类型}
+\begin{lstlisting}
+cout << getMax(1.0, 2.5) << endl; // T被推断为double
+\end{lstlisting}
+生成如下函数实例
+\begin{lstlisting}
+const double& getMax(const double &a, const double &b){
+    return a>b ? a : b;
+}
+\end{lstlisting}
+
+\end{blueblock}
+\begin{blueblock}<4->{实例化方法二：显式指定类型}
+\begin{lstlisting}
+cout << getMax<double>(1.0, 2.5) << endl;       //显式指明T为 double
+cout << getMax<string>("Hi ", "C++") << endl;   //显式指明T为 string
+\end{lstlisting}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}<3->{说明}
+编译器在\alert{编译}的过程中，利用实参来推断模板参数的类型
+\end{yellowblock}
+\vspace{1.8cm}
+\begin{yellowblock}<4->{说明}
+用户显式地指明模板参数的类型
+\end{yellowblock}
+
+\end{columns}
+
+\end{frame}
+
+%-----------------
+
+\begin{frame}[fragile]{7.1.2~实例化函数模板\normalsize{~---~为类类型添加模板支持}}
+
+当模板函数的实参为\alert{类类型}时，需要为类对象添加模板使用到的相关操作：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+\column{0.65\textwidth}
+\begin{blueblock}<2->{示例代码}
+\begin{lstlisting}[moreemph={Fraction}]
+Fraction a(3,4),b(2,5);
+cout << getMax(a, b) << endl; // T为Fraction类型
+\end{lstlisting}
+\end{blueblock}
+
+\begin{blueblock}<3->{函数模板实例化}
+\begin{lstlisting}
+const Fraction& getMax(const Fraction &a, const Fraction &b){
+    return a>b ? a : b;
+}
+\end{lstlisting}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{greenblock}<4->{问题}
+在编译上面代码时提示编译错误，原因可能是什么？
+\end{greenblock}
+\begin{greenblock}<5->{答案}
+在\texttt{getMax}模板内部用到了关系\texttt{>}运算，但\texttt{Fraction}类不支持关系\texttt{>}运算
+\end{greenblock}
+\end{columns}
+
+\end{frame}
+
+%-----------------
+
+\begin{frame}[fragile]{7.1.2~实例化函数模板\normalsize{~---~为类类型添加模板支持}}
+
+给\texttt{Fraction}类型添加关系\texttt{>}运算支持：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{Fraction}类~关系\texttt{>}运算~声明及定义}
+\begin{lstlisting}[moreemph={Fraction}]
+class Fraction{
+    // 将关系>运算声明为Fraction类的友元
+    friend bool operator>(const Fraction &lhs, const Fraction &rhs);
+    // 其它成员与之前一致
+    ...
+};
+
+bool operator>(const Fraction &lhs, const Fraction &rhs){
+    return lhs.m_numerator*rhs.m_denominator > lhs.m_denominator*rhs.m_numerator;
+}
+\end{lstlisting}
+\end{blueblock}
+\column{0.3\textwidth}
+\begin{yellowblock}{说明}
+根据运算符重载的原则将关系运算符函数\texttt{operator>}作为\texttt{Fraction}类的辅助函数，并将其声明为\texttt{Fraction}类的友元
+\end{yellowblock}
+\end{columns}
+
+\end{frame}
+
+%-------------------------------------
+\subsection{模板参数类型}
+%-------------------------------------
+
+\begin{frame}[fragile]{7.1.3~模板参数类型}
+
+以下两组代码中，函数\alert{模板参数}有什么异同？
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+\column{0.5\textwidth}
+\begin{blueblock}{\texttt{foo}函数定义}
+\begin{tikzpicture}[overlay]
+  \visible<2->{\draw[red,thick] (3.7,-0.3)--(5.5,-0.3);}
+\end{tikzpicture}
+\vspace{-4mm}
+\begin{lstlisting}[moreemph={T,U}]
+template <typename T, typename U>
+T foo(const T &t, const U &u) {
+    return T(t);
+}
+\end{lstlisting}
+\end{blueblock}
+\begin{blueblock}{\texttt{maxElem}函数定义}
+\begin{tikzpicture}[overlay]
+  \visible<2->{\draw[red,thick] (3.5,-0.3)--(5.0,-0.3);}
+\end{tikzpicture}
+\vspace{-4mm}
+\begin{lstlisting}[moreemph={T}]
+template<typename T, int size>
+const T& maxElem(T (&arr)[size]) {
+    T *p = &arr[0];
+    for (auto i = 0; i < size; ++i)
+        if (*p < arr[i])
+            p = &arr[i];
+    return *p;
+}
+\end{lstlisting}
+\end{blueblock}
+
+
+\column{0.45\textwidth}
+\begin{block}<2->{类型参数}
+作为\alert{类型说明符}，指定函数的返回值类型、形参类型以及函数体内对象的类型等
+\end{block}
+\begin{block}<2->{非类型参数}
+代表一个值，当编译器实例化该模板时必须要为其提供一个\alert{常量}表达式
+\end{block}
+\begin{yellowblock}<3->{说明}
+\texttt{maxElem}函数模板中的函数形参\texttt{arr}为一个指向含有\texttt{size}个\texttt{T}类型数据元素数组的引用
+\end{yellowblock}
+\end{columns}
+
+\end{frame}
+
+%-------------------
+
+\begin{frame}[fragile]{7.1.3~模板参数类型}
+
+调用\texttt{maxElem}函数：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{maxElem}函数模板实例化}
+\begin{lstlisting}
+int arr[10] = {1,8,5,3};
+int x = maxElem(arr);
+// 或者显式调用 maxElem<int,10>(arr);
+\end{lstlisting}
+\end{blueblock}
+编译器将会生成如下版本的函数：
+\begin{blueblock}{}
+\vspace{-2.5mm}\begin{lstlisting}
+const int& maxElem(int (&arr)[10]);
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{greenblock}<2->{问题}
+传递数组参数还有什么方式？
+\end{greenblock}
+\begin{greenblock}<3->{答案}
+还可以通过指针传递数组首地址的方式
+\end{greenblock}
+
+\end{columns}
+
+\end{frame}
+
+%------------------
+
+\begin{frame}[fragile]{7.1.3~模板参数类型\normalsize{~---~模板重载与特化}}
+
+如果前面定义的\texttt{getMax}函数模板在调用过程中的实参为指针类型：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{getMax}函数调用一}
+\begin{lstlisting}[moreemph={T}]
+int a = 1, b = 2;
+getMax(&a, &b);
+\end{lstlisting}
+\end{blueblock}
+\begin{blueblock}{\texttt{getMax}定义一}
+\begin{lstlisting}[moreemph={T}]
+template <typename T>
+const T& getMax(const T &a, const T &b){
+    return a > b ? a : b;
+}
+\end{lstlisting}
+\begin{tikzpicture}[overlay]
+  \visible<3->{\draw[blue,->,line width=1.5pt] (2,0.5)--(2,0);}
+\end{tikzpicture}
+\begin{onlyenv}<3->
+\begin{lstlisting}[moreemph={T}]
+const int* & getMax(const int* &a, const int* &b){
+    return a > b ? a : b;
+}
+\end{lstlisting}
+\end{onlyenv}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}{说明}
+需要返回两个指针所指向的对象的比较结果
+\end{yellowblock}
+\begin{greenblock}{问题}
+\texttt{getMax}函数模板的定义还能否满足要求？
+\end{greenblock}
+\begin{greenblock}<2->{答案}
+不能。编译器推演出的参数\texttt{T}为\texttt{int*}，函数体里面的操作变成了两个指针对象的比较
+\end{greenblock}
+
+\end{columns}
+
+\end{frame}
+
+%-----------------
+
+\begin{frame}[fragile]{7.1.3~模板参数类型\normalsize{~---~模板重载与特化}}
+
+为此，需要\alert{重载}一个\texttt{getMax}模板函数：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{getMax}函数调用二}
+\begin{lstlisting}[moreemph={T}]
+int a = 1, b = 2;
+getMax(&a, &b);
+\end{lstlisting}
+\end{blueblock}
+\begin{blueblock}{\texttt{getMax}函数模板重载}
+\begin{lstlisting}[moreemph={T}]
+template <typename T>
+T* const & getMax( T* const &a, T* const &b){
+    return *a>*b ? a : b;
+}
+\end{lstlisting}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}{说明}
+模板实参\texttt{T}的类型为\texttt{int}，\texttt{*a}和\texttt{*b}指向的是\texttt{int}对象，函数体里面的操作是两个\texttt{int}对象的比较
+\end{yellowblock}
+
+\end{columns}
+
+\end{frame}
+
+%-----------------
+
+\begin{frame}[fragile]{7.1.3~模板参数类型\normalsize{~---~模板重载与特化}}
+
+进一步，如果调用的实参是指向字符串常量的指针：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{getMax}函数调用三}
+\begin{lstlisting}[moreemph={T}]
+const char *a = "Hi", *b = "C++";
+cout << getMax(a, b) << endl;
+\end{lstlisting}
+\end{blueblock}
+\begin{blueblock}{\texttt{getMax}函数定义二}
+\vspace{-2.5mm}\begin{lstlisting}[moreemph={T}]
+template <typename T>
+const T & getMax(const T &a, const T &b){
+    return a > b ? a : b;
+}
+
+template <typename T>
+T* const & getMax( T* const &a, T* const &b){
+    return *a>*b ? a : b;
+}
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}{说明}
+需要返回指向字符串值较大的字符指针
+\end{yellowblock}
+\begin{greenblock}<2->{问题}
+现有的两个\texttt{getMax}函数的定义还能否满足要求？
+\end{greenblock}
+\begin{greenblock}<3->{答案}
+不能。\texttt{*a}和\texttt{*b}指向的是单个字符，函数体里面的操作变成了两个字符的比较
+\end{greenblock}
+
+\end{columns}
+
+\end{frame}
+
+%-----------------
+
+\begin{frame}[fragile]{7.1.3~模板参数类型\normalsize{~---~模板重载与特化}}
+
+为此，需要\alert{特例化}一个\texttt{getMax}模板函数：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{getMax}函数调用三}
+\begin{lstlisting}[moreemph={T}]
+const char *a = "Hi", *b = "C++";
+cout << getMax(a, b) << endl;
+\end{lstlisting}
+\end{blueblock}
+\begin{blueblock}{\texttt{getMax}函数模板特化}
+\begin{lstlisting}[moreemph={T}]
+template <>
+const char* const & getMax(const char* const &a, const char* const &b){
+    return strcmp(a,b) > 0 ? a : b;
+}
+\end{lstlisting}
+\end{blueblock}
+
+
+\column{0.3\textwidth}
+\begin{yellowblock}{说明}
+模板参数列表为空，表明将显式提供所有模板实参
+\end{yellowblock}
+\vspace{-2mm}
+\begin{yellowblock}{说明}
+\texttt{T}被推断为\texttt{const char*}，\texttt{a}和\texttt{b}分别为一个指向\texttt{const char}对象的\texttt{const}指针的引用，函数是对两个字符串值的比较
+\end{yellowblock}
+\vspace{-2mm}
+\begin{greenblock}<2->{问题}
+为什么会选择特例化的版本？
+\end{greenblock}
+
+\end{columns}
+
+\end{frame}
+
+%-----------------
+
+\begin{frame}[fragile]{7.1.3~模板参数类型\normalsize{~---~模板重载与特化}}
+
+还可以通过模板特化改善算法：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}<2->{\texttt{Swap}函数模板定义}
+\vspace{-2.5mm}\begin{lstlisting}[moreemph={T}]
+template<typename T>
+void Swap(T &a, T &b) {
+    T c(a); // 复制构造对象 c
+    a = b;
+    b = c;
+}
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}<2->{说明}
+需要构造一个辅助的局部对象\texttt{c}，才能完成\texttt{a}和\texttt{b}的交换
+\end{yellowblock}
+
+\end{columns}
+
+
+\uncover<3->{如果\texttt{T}是\texttt{int}，可以利用模板特化做出优化:}
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}<4->{\texttt{Swap}函数模板特化}
+\vspace{-2.5mm}\begin{lstlisting}[moreemph={T}]
+template<>
+void Swap(int &a, int &b)
+    a ^= b;
+    b ^= a;
+    a ^= b;
+}
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}<4->{说明}
+利用异或操作完成两个整数的交换,没有创建辅助对象，没有产生构造和析构行为，提高了执行效率
+\end{yellowblock}
+
+\end{columns}
+
+\end{frame}
+
+%-----------------
+
+%-------------------------------------
+\subsection{类成员模板}
+%-------------------------------------
+
+%-----------------
+\begin{frame}[fragile]{7.1.4~类成员模板}
+
+类的成员函数也可以定义为函数模板：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{类\texttt{X}定义}
+\begin{lstlisting}[moreemph={T}]
+class X{
+    void * m_p = nullptr;
+public:
+    template <typename T>
+    void reset(T *t) { m_p = t; }
+};
+\end{lstlisting}
+\end{blueblock}
+\begin{blueblock}<2->{\texttt{reset}函数调用}
+\begin{lstlisting}[moreemph={T}]
+int i = 0;
+double d = 0;
+X x;
+x.reset(&i); // 或者x.reset<int>(&i);
+x.reset(&d); // 或者x.reset<double>(&d);
+\end{lstlisting}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}{说明}
+成员函数\texttt{reset}定义为一个函数模板，接受不同类型的指针实参
+\end{yellowblock}
+\begin{yellowblock}<2->{说明}
+$\bullet$ 第一条\texttt{reset}函数调用中\texttt{T}被推断为\texttt{int}类型，\texttt{m\_p}存放整型对象\texttt{i}的地址\\
+$\bullet$ 第二条\texttt{reset}函数调用中\texttt{T}被推断为\texttt{double}类型，\texttt{m\_p}存放\texttt{double}类对象\texttt{d}的地址
+\end{yellowblock}
+
+\end{columns}
+
+\end{frame}
+%-----------------
+
+
+
+%-------------------------------------
+\subsection{可变参函数模板}
+%-------------------------------------
+
+\begin{frame}[fragile]{7.1.5~可变参函数模板}
+
+C++11新标准允许我们使用\alert{数目可变}的模板参数：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{foo}函数定义}
+\begin{lstlisting}[moreemph={T}]
+template<typename... Args >
+    void foo(Args... args) {
+    // 打印参数包args中参数的个数
+    cout << sizeof...(args) << endl;
+}
+\end{lstlisting}
+\end{blueblock}
+\begin{blueblock}<2->{\texttt{foo}函数调用}
+\begin{lstlisting}[moreemph={T}]
+foo(); // 输出：0
+foo(1,1.5); // 输出：2
+foo(1,1.5,"C++"); // 输出：3
+\end{lstlisting}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}{说明}
+$\bullet$ 可变数目的参数称为\alert{参数包}，用省略号“\alert{\texttt{...}}”表示，可包含0到任意个模板参数\\
+$\bullet$ \texttt{foo}函数的形参\texttt{args}为模板参数包类型，接受可变数目的实参
+\end{yellowblock}
+\end{columns}
+\end{frame}
+
+%-----------------
+
+\begin{frame}[fragile]{7.1.5~可变参函数模板\normalsize{~---~包展开}}
+
+可以通过\alert{递归}的方式展开函数模板参数包：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{print}函数定义}
+\vspace{-2mm}\begin{lstlisting}[moreemph={T}]
+template<typename T, typename... Args>
+ostream& print(ostream &os, const T &t, const Args&... rest) {
+    os << t << " "; // 打印第一个参数
+    return print(os, rest...); // 递归调用
+}
+
+template<typename T>
+ostream& print(ostream &os, const T &t) {
+    return os << t; // 打印最后一个参数
+}
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+\begin{blueblock}<2->{\texttt{print}函数调用}
+\vspace{-1.5mm}\begin{lstlisting}[moreemph={T}]
+print(cout,1, 2.5, "C++") << endl; // 输出1 2.5 C++
+\end{lstlisting}\vspace{-1.5mm}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{yellowblock}{说明}
+$\bullet$ 第一次处理参数包中的第一个参数，然后用剩余参数调用自身\\
+$\bullet$ 当参数包里面只剩下一个参数时，非可变参模板与可变参模板都匹配，但是非可变参模板更特例化，编译器首选非可变参数版本
+\end{yellowblock}
+
+\end{columns}
+
+\end{frame}
+
+%-----------------
+
+\begin{frame}[fragile]{7.1.5~可变参函数模板\normalsize{~---~转发参数包}}
+\begin{block}{在泛型编程中，常常需要将参数原封不动的转发给另外一个函数}
+\begin{tikzpicture}[overlay]
+\visible<2->{\draw[color=red!70,->,line width=1.5pt] (6.5,-2.5) -- node [color=red!70,pos=0.45,above,sloped]{改进效率}(8,-2.5);}
+\end{tikzpicture}
+\begin{columns}
+\column{0.4\textwidth}
+\begin{lstlisting}[moreemph={T}]
+template<typename TYPE, typename ARG>
+TYPE* get_instance(const ARG arg){
+
+     TYPE *ret;
+     ret = new TYPE(arg);
+     return ret;
+}
+\end{lstlisting}
+\column{0.4\textwidth}
+\begin{onlyenv}<2->
+\begin{lstlisting}[moreemph={T}]
+template<typename TYPE, typename ARG>
+TYPE* get_instance(const ARG &arg){
+
+     TYPE *ret;
+     ret = new TYPE(arg);
+     return ret;
+}
+\end{lstlisting}
+\end{onlyenv}
+\end{columns}
+\end{block}
+
+\begin{greenblock}<3->{问题}
+如果形参类型是右值，如何处理？
+\end{greenblock}
+\end{frame}
+\begin{frame}[fragile]{7.1.5~可变参函数模板\normalsize{~---~转发参数包}}
+
+两个函数的形参都是\alert{右值引用}，\texttt{forwardValue}函数调用报错，为什么？
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.65\textwidth}
+\begin{blueblock}{\texttt{forwardValue}函数及\texttt{rvalue}函数定义}
+\vspace{-2mm}\begin{lstlisting}[moreemph={T}]
+void rvalue(int &&val){}
+
+template<typename T>
+void forwardValue(T &&val) {
+    rvalue(val);
+}
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+\begin{blueblock}{\texttt{forwardValue}函数调用}
+\vspace{-2mm}\begin{lstlisting}[moreemph={T}]
+forwardValue(42);   // 错误
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+\begin{blueblock}<2->{\texttt{forwardValue}函数调用细节}
+\vspace{-2mm}\begin{lstlisting}[moreemph={T}]
+T &&val = 42;       //等同于auto &&val = 42
+rvalue(val);
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+
+\column{0.3\textwidth}
+\begin{greenblock}<2->{答案}
+$\bullet$ 右值引用声明 \texttt{\&\&}与类型推导结合可以与右值绑定，所以\texttt{val}为右值引用\\
+$\bullet$ 右值引用\texttt{val}引用右值42，但\alert{\texttt{val}本身是左值}\\
+$\bullet$ \texttt{rvalue}函数只接受右值形参，但\texttt{val}是左值
+\end{greenblock}
+\begin{greenblock}<3->{问题}
+可以让传入\texttt{rvalue}函数的\alert{实参保持原属性吗}？
+\end{greenblock}
+
+\end{columns}
+
+\end{frame}
+%-----------------
+
+\begin{frame}[fragile]{7.1.5~可变参函数模板\normalsize{~---~转发参数包}}
+
+在C++11新标准下可以利用~\alert{\texttt{std::forward}}~函数实现：
+
+\vspace{-4mm}
+
+\begin{columns}[t]
+
+\column{0.6\textwidth}
+\begin{blueblock}{\texttt{std::forward}转发左值描述性声明}
+\vspace{-2mm}\begin{lstlisting}[basicstyle=\scriptsize\ttfamily,moreemph={T}]
+template<typename T>
+T&& forward( typename std::remove_reference<T>::type& t );
+\end{lstlisting}\vspace{-2mm}
+\end{blueblock}
+\begin{blueblock}<2->{\texttt{forwardValue}函数定义二}
+\vspace{-2mm}
+\begin{lstlisting}[moreemph={T}]
+template<typename T>
+void forwardValue(T &&val) {
+    rvalue(std::forward<T>(val));
+}
+\end{lstlisting}
+\end{blueblock}
+\begin{blueblock}<2->{\texttt{forwardValue}函数调用二}
+\vspace{-2mm}
+\begin{lstlisting}[moreemph={T}]
+forwardValue(42);       //正确
+int a = 42;
+forwardValue(a);        //正确
+\end{lstlisting}
+\end{blueblock}
+
+\column{0.35\textwidth}
+\begin{yellowblock}<3->{说明}
+$\bullet$ 当传入\texttt{forwardValue}的实参为右值，\texttt{T}被推断为非引用类型，forward<T>返回右值引用\\
+$\bullet$ 当传入\texttt{forwardValue}的实参为左值，\texttt{T}被推断为左值引用类型，此时\texttt{forward<T>}将返回左值引用
+\end{yellowblock}
+\vspace{-2mm}
+\begin{redblock}<4->{注意}
+在C++11新标准下，\\
+\texttt{\&\& \&和\& \&\&}折叠为 \texttt{\&}
+\end{redblock}
+
+\end{columns}
+
+\end{frame}
+
+

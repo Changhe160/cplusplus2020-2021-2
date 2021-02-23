@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="open">icons/open.png</file>
+        <file>icons/quit.png</file>
+    </qresource>
+</RCC>

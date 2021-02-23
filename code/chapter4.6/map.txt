@@ -1,0 +1,8 @@
+0&\bomb&\bomb&\bomb&\bomb&4&5&6&7\\\cline{2-9}
+1&8&\bomb&10&\bomb&\bomb&13&\bomb&\bomb\\\cline{2-9}
+2&\bomb&17&18&19&20&21&22&\bomb\\\cline{2-9}
+3&24&\bomb&26&\bomb&\bomb&29&\bomb&31\\\cline{2-9}
+4&\bomb&33&\bomb&\bomb&\bomb&\bomb&38&39\\\cline{2-9}
+5&\bomb&41&\bomb&43&44&45&\bomb&\bomb\\\cline{2-9}
+6&48&49&\bomb&\bomb&52&\bomb&54&\bomb\\\cline{2-9}
+7&\bomb&57&\bomb&59&\bomb&\bomb&\bomb&\bomb\\\cline{2-9}
