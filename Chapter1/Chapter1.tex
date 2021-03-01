@@ -240,18 +240,18 @@ int main() {
 \vspace{-3mm}
 \begin{lstlisting}
 #include<iostream>
-using namespace std;    //使用标准命名空间
-class Cylinder {    //定义一个名为Cylinder的类类型
+using namespace std;        //使用标准命名空间
+class Cylinder {            //定义一个名为Cylinder的类类型
     double m_radius, m_height;
 public:
-    double volume() {   //计算圆柱体的体积
+    double volume() {       //计算圆柱体的体积
         return 3.14*m_radius*m_radius*m_height;
     }
-    Cylinder(double i=0, double h=0) :m_radius(i), m_height(h){}    //初始化半径和高的操作
+    Cylinder(double i=0, double h=0) :m_radius(i), m_height(h){}            //初始化半径和高的操作
 };
 int main() {
-    Cylinder object(1.0, 1.0);   //定义并初始化对象object
-    double vol=object.volume();  //调用类成员volume函数
+    Cylinder object(1.0, 1.0);      //定义并初始化对象object
+    double vol=object.volume();     //调用类成员volume函数
     cout << vol << endl;
 }
 \end{lstlisting}
@@ -290,7 +290,7 @@ int main() {
 \column{0.5\textwidth}
 \begin{yellowblock}{说明}
 \begin{enumerate}
-  \item \texttt{C++}程序工程的创建\\推荐使用\alert{\texttt{Visual Studio}}编译器
+  \item \texttt{C++}程序工程的创建，Windows下推荐使用\alert{\texttt{Visual Studio}}编译器
   \item 添加空的源文件\texttt{(*.cpp)}，如\texttt{main.cpp}
   \item 编写源代码
   \item 编译，编译器会指出具体的语法错误
@@ -312,10 +312,11 @@ int main() {
 \begin{blueblock}{\texttt{Visual Studio}几个常用快捷键}
 \begin{tabular}{ll}
   % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
-  \alert{\texttt{F5}} & 执行程序 \\
   \alert{\texttt{F7}} & 编译源文件 \\
   \alert{\texttt{F9}} & 添加断点 \\
   \alert{\texttt{F10}} & 单步执行一行代码 \\
+  \alert{\texttt{F11}} & 进入函数体 \\
+  \alert{\texttt{F5}} & 执行程序 \\
   \alert{\texttt{Ctrl+F5}} & 执行但不调试 \\
 \end{tabular}
 \end{blueblock}
