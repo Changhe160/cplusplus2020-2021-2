@@ -7,6 +7,7 @@
 \usepackage{booktabs}
 \usepackage{threeparttable}
 \usepackage{soul}
+\usepackage{tikz,tikz-layers}
 %\usepackage{babel}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -209,7 +210,7 @@ volatile &wchar\_t &\alert{while}\\
     MyFile & 94Salary \\
     Salary 94 & Salary94 \\
     amount & \$amount \\
-    void & f3.5 \\
+    double & f3.5 \\
     Num\_of\_Student & name\_5 \\
     \end{tabular}
 \end{center}
@@ -227,7 +228,7 @@ volatile &wchar\_t &\alert{while}\\
     \textcolor{blue}{MyFile} & \st{94Salary} \\
     \st{Salary 94} & \textcolor{blue}{Salary94} \\
     \textcolor{blue}{amount} & \st{\$amount} \\
-    \st{void} & \st{f3.5} \\
+    \st{double} & \st{f3.5} \\
     \textcolor{blue}{Num\_of\_Student} & \textcolor{blue}{name\_5}\\
     \end{tabular}
 \end{center}
@@ -255,6 +256,7 @@ volatile &wchar\_t &\alert{while}\\
 
 %---------------------------------------------------------------------------------------------
 \begin{frame}[fragile]{2.2 基本数据类型\normalsize{~---~内置类型}}
+\vspace{-3mm}
 \begin{center}
 \begin{table}[h]
 \begin{threeparttable}
@@ -281,13 +283,13 @@ long double&扩展的精度浮点数&精度不低于~double~类型&8\\\hline
     \begin{tablenotes}
       \scriptsize
    \item 位（bit）是计算机中存储数据的最小单位，指二进制数中的一个位数，其值为0或1。
-\item 字节（byte）是计算机存储容量的基本单位，一个字节由8位二进制数组成，即8个比特位。
+\item 字节（Byte）是计算机存储容量的基本单位，一个字节由8位二进制数组成，即8个比特位。
     \end{tablenotes}
 \end{threeparttable}
-
-\vspace{-0.5cm}
+\vspace{-0.2cm}
 \end{table}
 \end{center}
+{ \scriptsize ~~~~\onslide<2->{除bool和wchar\_t，其他内置类型分有符号（signed）和无符号之分（unsigned），默认为signed.}}
 \end{frame}
 
 
@@ -321,7 +323,7 @@ long double&扩展的精度浮点数&精度不低于~double~类型&8\\\hline
 原码， 3：0000 0011， -3：1000 0011\\
 反码， 3：0000 0011， -3：1111 1100\\
 补码， 3：0000 0011， -3：1111 1101
-\item \onslide<2->{整数在计算机中以补码形式存储}
+\item \onslide<2->{整数在计算机中以补码形式存储(为什么)}
 	\end{itemize}
 \end{block}
 
@@ -367,7 +369,7 @@ long double&扩展的精度浮点数&精度不低于~double~类型&8\\\hline
 \column{0.45\textwidth}
 \begin{block}{实型常量的表示方法}
 		\begin{itemize}
-			\item 小数形式：如~3.14159~~~~~423.5~~~~~0.
+			\item 小数形式：如~3.14159~~~~~423.5~~~~~\alert{0.}
             \item 指数形式：如~3.14159E0~~~~4.235e2
 		\end{itemize}
 注意：实型常量默认类型为double类型
@@ -387,19 +389,59 @@ long double&扩展的精度浮点数&精度不低于~double~类型&8\\\hline
 
 %---------------------------------------------------------------------------------------------
 \begin{frame}[fragile]{2.2 基本数据类型\normalsize{~---~常量（字面值常量）}}
+\begin{columns}[t]
+\column{\textwidth}
+\begin{block}{整型常量的表示方法}	
+		\begin{itemize}
+			\item 十进制整数：如~58
+
+            \item 八进制整数（以\alert{0}开头，\alert{0-7}组成）：如~072
+
+            \item 十六进制整数（以\alert{0x}或\alert{0X}开头，由数字\alert{0-9}和字母\alert{A-F}(大小写均可)）：如~0x3A
+		\end{itemize}
+\end{block}
+
+\end{columns}
+
+\begin{columns}[t]
+\column{0.45\textwidth}
+\begin{block}{实型常量的表示方法}
+		\begin{itemize}
+			\item 小数形式：如~3.14159~~~~~423.5~~~~~\alert{0.}
+            \item 指数形式：如~3.14159E0~~~~4.235e2
+		\end{itemize}
+注意：实型常量默认类型为double类型
+\end{block}
+\column{0.45\textwidth}
+\begin{yellowblock}{说明}
+指数形式由\alert{尾数}、\alert{阶数}和\alert{ E或 e}组成，其中在E或e前面的尾数部分必须有数字，后面的阶数必须为整数
+\end{yellowblock}
+
+\begin{block}{判断下列表示是否合法}
+\st{1.43E3.5} ~~~~~~ \st{E4} ~~~~~~ -.34e-2 ~~~~~~ 123E12
+\end{block}
+\end{columns}
+
+\end{frame}
+
+%---------------------------------------------------------------------------------------------
+\begin{frame}[fragile]{2.2 基本数据类型\normalsize{~---~常量（字面值常量）}}
 \vspace{-3mm}
 \begin{columns}[t]
 \column{1.0\textwidth}
-\begin{block}{字符和字符串常量}		
+\begin{block}{字符和字符串常量}	
+\begin{tikzpicture}[overlay]
+  \visible<2->{\draw[red] (7.4,-0.3) rectangle (8,-1.4);}
+\end{tikzpicture}	
 		\begin{itemize}
-			\item \underline{字符常量}：由单引号括起来单个字符，如：~~\texttt{\alert{'a'}}~~~~\texttt{'1'}~~
-            \item \underline{字符串常量}：由双引号括起来的字符，如：~~\texttt{\alert{"a"}}~~~~\texttt{"Mandy"}。自动在末尾添加空字符（\texttt{'\textbackslash 0'}）
+			\item \underline{字符常量}：由单引号括起来单个字符，如：\texttt{\alert{'a'}}~~\texttt{'1'}，占用1个字节。
+            \item \underline{字符串常量}：由双引号括起来的字符，如：\texttt{\alert{"a"}}~~\texttt{"Mandy"}。自动在末尾添加空字符（\texttt{'\textbackslash 0'}）
             \item \underline{特殊字符}：用\alert{转义序列}表示方法，如：\textbackslash n~换行符、\textbackslash r~回车符，\textbackslash\textbackslash~反斜线等\\
             \textbackslash nnn 八进制数，\textbackslash xnn 十六进制数，如 \texttt{'\textbackslash 141'} 和\texttt{ '\textbackslash x61'} 都表示字符\texttt{'a'}
             \begin{lstlisting}[basicstyle=\small\ttfamily]
 cout << "Hi \"\103++\"\n"; // 输出Hi "C++"，转到新一行
             \end{lstlisting}
-
+\vspace{-2mm}
 		\end{itemize}
 \end{block}
 \pause
@@ -432,14 +474,13 @@ cout << "Hi \"\103++\"\n"; // 输出Hi "C++"，转到新一行
     \begin{spacing}{1.2}
         \begin{itemize}
         \item 对象是数据和操作的载体，当创建一个对象时，会为它分配一定内存空间
-        \item 具有数据\alert{类型}、\alert{名字}、\alert{内存结构}、支持的\alert{操作}、\alert{生命期}和\alert{作用域}等属性
+        \item 具有数据\alert{类型}、\alert{名字}、\alert{内存结构}、\alert{操作}、\alert{生命期}和\alert{作用域}等属性
     \end{itemize}
     \end{spacing}
 \end{block}
 \pause
 
 \begin{blueblock}{对象的定义}
-~\\
 一般格式：\alert{<数据类型名>~~~~对象名 ~;}\\
 ~\\
 例如：
@@ -447,6 +488,7 @@ cout << "Hi \"\103++\"\n"; // 输出Hi "C++"，转到新一行
 int counter;        //定义一个整型类型对象
 Cylinder object;    //定义一个Cylinder类类型对象
 \end{lstlisting}
+{\onslide<3->思考：创建对象时，编译器做了哪些事情？}
 \end{blueblock}
 \end{columns}
 \end{frame}
@@ -486,15 +528,15 @@ year = 2017;        //赋值操作，在对 year赋值之前，其在内存中�
 \begin{columns}[t]
 \column{0.72\textwidth}
 \alert{声明对象}需要利用关键字\alert{extern}
-   \begin{blueblock}<2->{例如}
+   \begin{blueblock}<2->{例如，分别在两个文件里面有}
     \begin{lstlisting}
-int i(1);       //在一个源文件里面定义对象 i 并初始化
-extern int i;   //在另外一个文件里面声明对象i，i已经定义过了
+int i(1);       //在一个源文件foo.cpp里面定义对象 i并初始化
+extern int i;   //在另外一个文件boo.cpp里面声明对象i，i已经定义过了
     \end{lstlisting}
 	\end{blueblock}
 \pause
 利用 extern 声明对象时提供一个初始值，这时声明就变成了定义
-   \begin{blueblock}<3->{例如}
+   \begin{blueblock}<3->{例如，在同一个源文件里有}
     \begin{lstlisting}
 extern int i = 0;   //定义i
 int i = 5;          //错误：对象i已经定义过了
@@ -521,8 +563,9 @@ int i = 5;          //错误：对象i已经定义过了
 %---------------------------------------------------------------------------------------------
 \begin{frame}[fragile]{2.3 对象\normalsize{~---~作用域和生命期}}
 \textcolor{blue}{作用域}：指标识符在代码中的可见范围，通常以花括号分隔\\
-\textcolor{blue}{生命期}：具有块域的对象，通常其生命期从定义处开始，在作用域结束时消亡
+\textcolor{blue}{生命期}：指对象在内存从产生到消亡的时间。具有块域的对象，通常其生命期从定义处开始，在作用域结束时消亡
 \pause
+\vspace{-3mm}
 \begin{columns}[t]
 \column{0.5\textwidth}
 \begin{blueblock}<2->{示例}
