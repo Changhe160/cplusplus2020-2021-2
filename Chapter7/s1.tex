@@ -337,10 +337,12 @@ const T& getMax(const T &a, const T &b){
     return a > b ? a : b;
 }
 \end{lstlisting}
+\vspace{-2mm}
 \begin{tikzpicture}[overlay]
   \visible<3->{\draw[blue,->,line width=1.5pt] (2,0.5)--(2,0);}
 \end{tikzpicture}
 \begin{onlyenv}<3->
+\vspace{-2mm}
 \begin{lstlisting}[moreemph={T}]
 const int* & getMax(const int* &a, const int* &b){
     return a > b ? a : b;
@@ -685,7 +687,7 @@ $\bullet$ 当参数包里面只剩下一个参数时，非可变参模板与可�
 \visible<2->{\draw[color=red!70,->,line width=1.5pt] (6.5,-2.5) -- node [color=red!70,pos=0.45,above,sloped]{改进效率}(8,-2.5);}
 \end{tikzpicture}
 \begin{columns}
-\column{0.4\textwidth}
+\column{0.45\textwidth}
 \begin{lstlisting}[moreemph={T}]
 template<typename TYPE, typename ARG>
 TYPE* get_instance(const ARG arg){
@@ -695,7 +697,7 @@ TYPE* get_instance(const ARG arg){
      return ret;
 }
 \end{lstlisting}
-\column{0.4\textwidth}
+\column{0.45\textwidth}
 \begin{onlyenv}<2->
 \begin{lstlisting}[moreemph={T}]
 template<typename TYPE, typename ARG>
