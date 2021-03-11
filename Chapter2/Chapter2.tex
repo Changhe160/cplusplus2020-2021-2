@@ -969,7 +969,7 @@ N = 40;               //错误：不能改变右值对象 N 的值
 %---------------------------------------------------------------------------------------------
 \begin{frame}[fragile]{2.5 表达式\normalsize{~---~算数运算符}}
 \begin{columns}[t]
-\column{0.45\textwidth}
+\column{0.4\textwidth}
 \begin{blueblock}{ }
 \begin{table}[h]
 \begin{center}
@@ -996,7 +996,7 @@ N = 40;               //错误：不能改变右值对象 N 的值
 \end{table}
 \end{blueblock}
 
-\column{0.5\textwidth}
+\column{0.55\textwidth}
 \begin{block}<2->{}
 \begin{spacing}{1}
 优先级：\alert<3->{加、减}~<~\alert<4->{乘、除、求余}~<~\alert<5->{单目}\\
@@ -1005,12 +1005,11 @@ N = 40;               //错误：不能改变右值对象 N 的值
 \end{block}
 
 \begin{yellowblock}<7->{说明}
-\begin{itemize}
-    \item 整型数的算术运算的结果还是整数，例如：\texttt{21/6}的结果是\texttt{3}，余数被舍弃
-    \item 求余运算中的两个运算数必须是整型类型，如：\texttt{5\%3}
-    \item 如果运算对象的数据类型不相同，编译器会自动进行类型转换,原则是\alert{小数据类型向大数据类型转换}
-    \item 注意数据溢出问题
-\end{itemize}
+ $\bullet$ 整型数的算术运算的结果还是整数，例如：\texttt{21/6}的结果是\texttt{3}，\alert{余数被舍弃}\\
+ $\bullet$  求余运算中的两个运算数必须是\alert{整型类型}，如：\texttt{5\%3}\\
+ $\bullet$ 如果运算对象的数据类型不相同，编译器会自动进行类型转换,原则是\alert{小数据类型向大数据类型转换}\\
+ $\bullet$  注意数据溢出问题\\
+  $\bullet$ \onslide<8->{计算结果为什么是右值？}
 \end{yellowblock}
 
 \end{columns}
@@ -1057,9 +1056,9 @@ int—>unsigned—>long—>float—>double
 格式：\alert{对象 = 表达式}\\
 \begin{lstlisting}
 例如
-int i = 2;  //对象的初始化
-i = 5;      //对象的赋值
-i = i + 6;  //对象的赋值
+int i = 2;      //对象的初始化
+i = 5;          //对象的赋值
+i = i + 6;      //对象的赋值
 \end{lstlisting}
 \end{block}
 
@@ -1082,7 +1081,7 @@ i = i + 6;  //对象的赋值
   \item 功能是把赋值符号右侧表达式的值写入到赋值符号左侧的操作对象里面
   \item 左侧操作对象必须是支持写操作的左值,例如\begin{lstlisting}
 int i = 0, j = 2;
-i + j = 10;//错误：算术表达式为右值
+i + j = 10;         //错误：算术表达式为右值
 \end{lstlisting}
 \end{itemize}
 \end{yellowblock}
@@ -1100,21 +1099,21 @@ i + j = 10;//错误：算术表达式为右值
 \begin{lstlisting}
 int i = 0;
 double d = 3.14159;
-i = d; //表达式的结果的类型是 int，值是3，但d的值不变
+i = d;          //表达式的结果的类型是 int，值是3，但d的值不变
 \end{lstlisting} \vspace{-2mm}
 \pause
     \item 赋值运算满足右结合性，例如
 \pause \vspace{-2mm}
 \begin{lstlisting}
-i = j = 5; //i 和 j 的值都是5
-//根据右结合性，先把 5 赋给 j ，然后把 j = 5 的值赋给 i。
+i = j = 5;      //i 和 j 的值都是5
+                //根据右结合性，先把 5 赋给 j ，然后把 j = 5 的值赋给 i。
 \end{lstlisting} \vspace{-2mm}
 \pause
     \item 赋值运算符的优先级较低，有时需要加上括号才能正确执行，例如：
 \pause \vspace{-2mm}
 \begin{lstlisting}
-i = 2 + j = 4; //错误：2 + j 为右值，不能作为第二个赋值符号的左侧对象
-i = 2 + (j = 4); //正确：把 j = 4 的值加上2赋给 i ， i 和 j 的值分别为6和4
+i = 2 + j = 4;      //错误：2 + j 为右值，不能作为第二个赋值符号的左侧对象
+i = 2 + (j = 4);    //正确：把 j = 4 的值加上2赋给 i ， i 和 j 的值分别为6和4
 \end{lstlisting}
  \vspace{-2mm}
 \end{itemize}
@@ -1145,7 +1144,7 @@ i *= j + 3;
 
 \column{0.45\textwidth}
 \begin{yellowblock}<2->{代码分析}
-第二行代码需要进行两次计算，首先计算(\texttt{couter+5})的值，然后再赋值给\texttt{counter}。为简化计算，\texttt{C++}提供了\alert{复合运算符(\texttt{+=}~~~\texttt{-=}~~~\texttt{/=}~~~\texttt{*=}~~~\texttt{\%=})}
+第二行代码首先计算\texttt{couter+5}的值，然后将结果放到一个临时对象里，再取值赋值给\texttt{counter}。为简化计算，\texttt{C++}提供了\alert{复合运算符(\texttt{+=}~~~\texttt{-=}~~~\texttt{/=}~~~\texttt{*=}~~~\texttt{\%=})}
 \end{yellowblock}
 
 \begin{yellowblock}<4->{小结}
@@ -1212,7 +1211,7 @@ j = ++i;
 \hline
 \rowcolor{lightblue}运算符&功能&结合性&用法\\
 \hline
-\texttt{!}& 逻辑非&右&	\texttt{!}5\\
+\texttt{!}& \alert{逻辑非}&右&	\texttt{!}5\\
 \hline
 \texttt{<}&	小于&左&	  5\texttt{<}4\\
 \texttt{<=}&小于等于&左&	5\texttt{<=}4\\
@@ -1222,9 +1221,9 @@ j = ++i;
 \texttt{==}&等于&左&	5\texttt{==}4\\
 \texttt{!=}&不等于&左&	5\texttt{!=}4\\
 \hline
-\texttt{\&\&}&逻辑与&左&	5\texttt{\&\&}4\\
+\texttt{\&\&}&\alert{逻辑与}&左&	5\texttt{\&\&}4\\
 \hline
-\texttt{||}&逻辑或&左&	5\texttt{||}4\\
+\texttt{||}&\alert{逻辑或}&左&	5\texttt{||}4\\
 \hline
 \end{tabular}}}
 \end{center}
@@ -1251,7 +1250,7 @@ j = ++i;
 
 \begin{block}{ }
 \begin{spacing}{1.}
-结果：右值
+结果：返回一个true或者false的右值
 \end{spacing}
 
 \end{block}
