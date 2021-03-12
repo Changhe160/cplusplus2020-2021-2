@@ -986,7 +986,7 @@ N = 40;               //错误：不能改变右值对象 N 的值
 \hline
 \texttt{*}&乘&双目，左结合	&	5\\
 \texttt{/}&除&双目，左结合	&	5\\
-\texttt{\%}&求余&双目，左结合&   5 \\
+\texttt{\%}&\alert{求余}&双目，左结合&   5 \\
 \hline
 \texttt{+}&加&双目，左结合	&	6\\
 \texttt{-}&减&双目，左结合	&	6\\
@@ -1009,7 +1009,7 @@ N = 40;               //错误：不能改变右值对象 N 的值
  $\bullet$  求余运算中的两个运算数必须是\alert{整型类型}，如：\texttt{5\%3}\\
  $\bullet$ 如果运算对象的数据类型不相同，编译器会自动进行类型转换,原则是\alert{小数据类型向大数据类型转换}\\
  $\bullet$  注意数据溢出问题\\
-  $\bullet$ \onslide<8->{计算结果为什么是右值？}
+  $\bullet$ \onslide<8->{计算结果存放在哪里？}
 \end{yellowblock}
 
 \end{columns}
@@ -1235,6 +1235,12 @@ j = ++i;
 ~\\
 \begin{block}{ }
 \begin{spacing}{1.}
+结果：返回一个true（非0）或者false（0）的右值
+\end{spacing}
+\end{block}
+\pause
+\begin{block}{ }
+\begin{spacing}{1.}
 优先级：\\
 赋值运算符~\texttt{<}~~\textcolor{blue}{逻辑或\texttt{||}~<~ 逻辑与\texttt{\&\&}~}~\texttt{<}~\textcolor{red}{关系运算符}~\texttt{<}~算术运算符~\texttt{<}~\textcolor{blue}{逻辑非\texttt{!}}
 \end{spacing}
@@ -1248,12 +1254,7 @@ j = ++i;
 
 \end{block}
 
-\begin{block}{ }
-\begin{spacing}{1.}
-结果：返回一个true或者false的右值
-\end{spacing}
 
-\end{block}
 
 \end{columns}
 \end{frame}
@@ -1261,7 +1262,7 @@ j = ++i;
 %---------------------------------------------------------------------------------------------
 \begin{frame}[fragile]{2.5 表达式\normalsize{~---~逻辑和关系运算符}}
 \begin{center}
-可以用\texttt{~i~$<=$~j~$<=$~k}直接\alert{构造表达式}\texttt{$i\leq j\leq k$}的逻辑关系吗？
+可以用\texttt{~i~$<=$~j~$<=$~k}直接构造\alert{数学表达式}\texttt{$i\leq j\leq k$}的逻辑关系吗？
 \end{center}
 \pause
 \begin{columns}[t]
