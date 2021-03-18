@@ -223,8 +223,8 @@
 		\begin{column}{0.48\textwidth}
 			\begin{block}<1->{\texttt{if}语句的语法格式：}
 				\begin{lstlisting}[basicstyle=\small\ttfamily]
-if (expr) {    //条件表达式
-    statement; //语句
+if (expr) {         //条件表达式
+    statement;      //语句
 }
         \end{lstlisting}
 			\end{block}
@@ -243,7 +243,7 @@ else {
 		\begin{column}<2->{0.48\textwidth}
 			\begin{figure}[ht]
 				\centering
-				\includegraphics[scale=0.38]{IF_statement.png}
+				\includegraphics[scale=0.5]{IF_statement.png}
 				% \caption{\texttt{else}分支结构执行流程}
 				% \label{fig:label}
 			\end{figure}
@@ -313,7 +313,7 @@ int main() {
 			\begin{column}{0.4\linewidth}
 				\begin{lstlisting}[firstnumber=6,numbers=left,numberstyle=\small,basicstyle=\normalsize\ttfamily]
     //n大于0且被3整除
-    if (n > 0 && n % 3 == 0) { 
+    if (n > 0 && n % 3 == 0) {
         cout << "Yes" << endl;
     }
     else {
@@ -395,10 +395,10 @@ int main() {
 			\item 上例中~\texttt{if}~和~\texttt{else}~语句个数相同，若~\texttt{if}~语句数目多于~\texttt{else}~语句数目，就会出现~\texttt{else}~和~\texttt{if}~匹配的问题，也称\alert{悬垂~\texttt{else（dangling else）}}。
 			\item \texttt{C++}规定~\texttt{else}~和离它\alert{最近的尚未匹配的~\texttt{if}~匹配}，如：\\
 			      \begin{lstlisting}[basicstyle=\small\ttfamily]
-        if (n % 2 == 0) //n 被 2 整除
-            if (n % 3 == 0) //n 被 3 整除
+        if (n % 2 == 0)             //n 被 2 整除
+            if (n % 3 == 0)         //n 被 3 整除
                 cout << "n 是 6 的倍数";
-            else //n 被 2 整除但不能被 3 整除
+            else                    //n 被 2 整除但不能被 3 整除
                 cout << "n 是 2 的倍数不是 3 的倍数";
             \end{lstlisting}\ttfamily
 		\end{itemize}
@@ -420,7 +420,7 @@ int main() {
             if (n % 3 == 0)
                 cout << "n 是 6 的倍数";
         }
-        else //n 不能被 2 整除
+        else            //n 不能被 2 整除
             cout << "n 不是 2 的倍数";
                     \end{lstlisting}\ttfamily
 		\end{itemize}
@@ -455,17 +455,17 @@ int main() {
 			\begin{column}{0.94\linewidth}
 				\begin{lstlisting}[numbers=left,numberstyle=\small,basicstyle=\small\ttfamily]
 #include<iostream>
-#include<cmath>    //用于求平方根函数sqrt，第12行代码
+#include<cmath>                         //用于求平方根函数sqrt，第12行代码
 using namespace std;
 int main() {
-    double a,b,c;   //创建3个double类型对象存放三个系数值
+    double a,b,c;                       //创建3个double类型对象存放三个系数值
     cout << "请输入a,b,c:";
     cin >> a >> b >> c;
     if (a != 0) {
         double delta = b*b - 4 * a*c;
         if (delta > 0) {
-            double x1, x2;     //需要时创建对象
-            delta = sqrt(delta);   //求delta的平方根
+            double x1, x2;              //需要时创建对象
+            delta = sqrt(delta);        //求delta的平方根
             x1 = (-b + delta) / (2 * a);
             x2 = (-b - delta) / (2 * a);
             cout << "方程有两个实根：" << x1 << ", " << x2 << endl;
@@ -492,7 +492,7 @@ int main() {
             cout << "方程有两个相同的实根：" << -b / (2 * a) << endl;
         }
     }
-    else {  //二次项系数不能为0
+    else {                          //二次项系数不能为0
         cout << "a不能为0" << endl;
     }
     return 0;
@@ -555,10 +555,10 @@ int main() {
         \end{lstlisting}
 			\item \texttt{case}标签的值\alert{必须为整型常量}，且每个\alert{标签值必须不同}，否则会引发语法错误：\\
 			      \begin{lstlisting}[basicstyle=\small\ttfamily]
-        case 9.0:case 10: //报错：表达式必须为整型常量表达式
+        case 9.0:case 10:           //报错：表达式必须为整型常量表达式
             cout << "A" << endl;
             break;
-        case 10:   //报错：标签值已经出现
+        case 10:                    //报错：标签值已经出现
             cout << "B" << endl;
             break;
             \end{lstlisting}
@@ -620,11 +620,11 @@ int main() {
 			      例如：\\
 			      \begin{lstlisting}[basicstyle=\small\ttfamily]
         case 8:{
-            char c = 'B'; //对象c只在case 8的作用域内可见
+            char c = 'B';   //对象c只在case 8的作用域内可见
             break;
         }
         case 7:
-            c = 'C';  //修改在前面标签处定义的对象，报错
+            c = 'C';        //修改在前面标签处定义的对象，报错
             break;
             \end{lstlisting}
              编译错误，case 7处对象c未定义
@@ -757,19 +757,18 @@ while (expr) { //条件表达式
 			\begin{column}{0.94\textwidth}
 				\begin{lstlisting}[numbers=left,numberstyle=\small,basicstyle=\small\ttfamily]
 #include<iostream>
-#include <iomanip>    //库函数setprecision
+#include <iomanip>          //库函数setprecision
 using namespace std;
 int main() {
-    //sum存放数列前i项的和, x存放当前项的值，注意初始值
-    double sum=0,x=1;
-    int i = 1;  //求解第i项
+    double sum=0,x=1;       //sum存放数列前i项的和, x存放当前项的值，注意初始值
+    int i = 1;              //求解第i项
     while (x > 1.0E-10) {
         sum += x;
-        ++i;          //在当前项基础上计算下一项
-        x *= (i - 1.) / (2 * i - 1);//注意1后面的小数点
-    }  //fixed和setprecision用于控制输出精度
-    cout<<"pi="<<fixed<<setprecision(10)<<2*sum<<endl;  //输出结果pi=3.1415926533
-
+        ++i;                //在当前项基础上计算下一项
+        x *= (i - 1.) / (2 * i - 1);    //注意1后面的小数点
+    }  
+    //fixed和setprecision用于控制输出精度，输出结果pi=3.1415926533
+    cout<<"pi="<<fixed<<setprecision(10)<<2*sum<<endl;  
     return 0;
 }
 \end{lstlisting}\ttfamily
@@ -782,7 +781,7 @@ int main() {
 	\frametitle{3.3 循环结构\small{—\texttt{do while}语句}}
 	% \framesubtitle{——\texttt{do while}语句}
 	\begin{columns}
-		\begin{column}{0.5\textwidth}
+		\begin{column}{0.55\textwidth}
 			\begin{block}{\texttt{do while}语句语法格式}
 				\begin{lstlisting}[basicstyle=\small\ttfamily]
 do{
@@ -794,7 +793,7 @@ do{
 		\begin{column}{0.4\textwidth}
 			\begin{figure}[ht]
 				\centering
-				\includegraphics[scale=0.4]{dowhile_statement.png}
+				\includegraphics[scale=0.5]{dowhile_statement.png}
 				% \caption{\texttt{do while}语句执行流程}
 				% \label{fig:label}
 			\end{figure}
@@ -866,7 +865,7 @@ int main() {
         x = x * x;
     }while(!x);
                 \end{lstlisting}
-\indent		A.死循环~~B.执行3次~~C.执行1次~~D.有语法错误
+\indent		A.死循环~~~~~B.执行3次~~\\C.执行1次~~D.有语法错误
 \column{0.5\textwidth}
 		 2.下面程序段的输出结果是？
 		\begin{lstlisting}[basicstyle=\small\ttfamily]
@@ -877,7 +876,7 @@ int main() {
     cout << y-- << endl;
     \end{lstlisting}
 
-\indent		A.-1~~B.1~~C.8~~D.0
+\indent		A.~-1~~~~B.~1~~~~C.~8~~~~D.~0
 \end{columns}
 \bigskip
 		\onslide<2->{答案：1.C~~2.D}
@@ -889,7 +888,7 @@ int main() {
 	\frametitle{3.3 循环结构\small{—\texttt{for}语句}}
 	% \framesubtitle{——\texttt{for}语句}
 	\begin{columns}
-		\begin{column}{0.48\textwidth}
+		\begin{column}{0.45\textwidth}
 			\begin{block}{\texttt{for}语句语法格式}
 				\begin{lstlisting}[basicstyle=\small\ttfamily]
 for(expr1; expr2; expr3){
@@ -905,10 +904,10 @@ for(int i = 1; i <= 100; ++i){
         \end{lstlisting}
 			\end{block}
 		\end{column}
-		\begin{column}{0.48\textwidth}
+		\begin{column}{0.45\textwidth}
 			\begin{figure}[ht]
 				\centering
-				\includegraphics[scale=0.6]{Fig3-1.jpg}
+				\includegraphics[scale=0.8]{Fig3-1.jpg}
 				% \caption{\texttt{for}语句执行流程}
 				% \label{fig:label}
 			\end{figure}
@@ -1209,7 +1208,7 @@ int main(){
             cout << "猜大了" << endl;
             break;              //跳出switch
         default:
-            cout << "恭喜！ 猜对了！" << endl;                               
+            cout << "恭喜！ 猜对了！" << endl;
             break;              //跳出switch
         }                       //switch结束
         if (val == 0) {
@@ -1251,7 +1250,7 @@ int main(){
 	\frametitle{3.4 跳转语句\small{—\texttt{continue}语句}}
 	% \framesubtitle{——\texttt{continue}语句}
 	\begin{exampleblock}{1.下面程序段的输出结果是什么？}
-		\ttfamily 
+		\ttfamily
 		\begin{lstlisting}[basicstyle=\small\ttfamily]
     int  main(){
         int x(0);
