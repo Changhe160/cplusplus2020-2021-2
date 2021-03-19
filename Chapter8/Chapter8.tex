@@ -1299,8 +1299,8 @@ struct A3{
 \end{columns}
 \vspace{-3mm}
 \begin{lstlisting}[]
-    cout<< alignof(char) <<" " << alignof(int) << '\n';                     //输出 1 4
-    cout<< alignof(A1) <<" "<<alignof(A2)<< " "<<alignof(A3)<<'\n';         //输出 4 4 1
+    cout<< alignof(char) <<" " << alignof(int) << '\n';                         //输出 1 4
+    cout<< alignof(A1) <<" "<<alignof(A2)<< " "<<alignof(A3)<<'\n';             //输出 4 4 1
 \end{lstlisting}
 \end{block}
 
@@ -1545,7 +1545,7 @@ template<typename T>
 Node<T>* SList<T>::insert(Node<T> *pos, const T &val) {
     (*@{\alert<1>{Node<T> *node = new Node<T>(val);}}@*) // 创建新结点
     (*@{\alert<1>{node->m\_next = pos->m\_next;}}@*)
-   (*@{\alert<2>{ pos->m\_next = node;}}@*)
+   (*@{\alert<2-3>{ pos->m\_next = node;}}@*)(*@{\onslide<3->{\color{blue}//可否与上一行代码互换？}}@*)
     if (pos == m_tail) // 判断pos是否为尾结点
         m_tail = node;
     return node;
@@ -2194,13 +2194,13 @@ double Calculator::doIt(const string &exp){
         else{                           //遇到运算符，while循环条件中不能忽略优先级相同的情况
             while (precedence(*it) <= precedence(m_opr.top())){
                 if (m_opr.top() == ’#’) break;              //如果运算符栈只剩下#，则计算完毕
-                calculate();                                //执行栈顶运算符计算
+                calculate();                                   //执行栈顶运算符计算
             }
             if ( *it != ’=’)   m_opr.push( *it);            //运算符入栈
-            ++it;                                           //继续扫描
+            ++it;                                              //继续扫描
         }
     }
-    return m_num.top();                                 //返回计算结果，注意数据栈此时非空
+    return m_num.top();                                     //返回计算结果，注意数据栈此时非空
 }
 \end{lstlisting}\vspace{-2mm}
 \end{blueblock}
