@@ -640,7 +640,6 @@ int main() {
 		\begin{columns}[t]
 			\begin{column}{0.04\linewidth}
 			\end{column}
-            \pause
 			\begin{column}{0.4\textwidth}
 				\begin{lstlisting}[numbers=left,numberstyle=\small,basicstyle=\small\ttfamily]
 #include<iostream>
@@ -723,7 +722,7 @@ while (expr) { //条件表达式
 	\frametitle{3.3 循环结构\small{—\texttt{while}语句}}
 	% \framesubtitle{——\texttt{while}语句}
 	\begin{exampleblock}{练习：}
-		下面程序段的运行结果是（）
+		下面程序段的运行结果是多少？
 		\begin{lstlisting}[basicstyle=\small\ttfamily]
         int x = 0, y = 0;
         while (x < 15) {
@@ -740,7 +739,7 @@ while (expr) { //条件表达式
 	% \framesubtitle{——\texttt{while}语句}
 	\begin{exampleblock}{例3.4：}
 		\ttfamily
-		根据以下公式利用迭代法求~$\pi$~的近似值，最后一项小于或等于~$1.0E-10$~时停止。\\
+		根据以下公式利用迭代法求~$\pi$~的近似值，最后一项小于或等于~1.0E-10~时停止。\\
 		\begin{center}\[\frac{\pi}{2}= 1+\frac{1}{3}+\frac{1}{3}\times\frac{2}{5}+\frac{1}{3}\times\frac{2}{5}\times\frac{3}{7}+\ldots+ x_{i}, ~~x_{i}=x_{i-1}\times\frac{i-1}{2i-1}\]
 		\end{center}
 	\end{exampleblock}
@@ -766,9 +765,9 @@ int main() {
         sum += x;
         ++i;                //在当前项基础上计算下一项
         x *= (i - 1.) / (2 * i - 1);    //注意1后面的小数点
-    }  
+    }
     //fixed和setprecision用于控制输出精度，输出结果pi=3.1415926533
-    cout<<"pi="<<fixed<<setprecision(10)<<2*sum<<endl;  
+    cout<<"pi="<<fixed<<setprecision(10)<<2*sum<<endl;
     return 0;
 }
 \end{lstlisting}\ttfamily
@@ -995,7 +994,7 @@ for (int i = 1, j = 100; i < j; ++i, --j) {
 	\frametitle{3.3 循环结构\small{—\texttt{for}语句}}
 	% \framesubtitle{——\texttt{for}语句}
 	\begin{exampleblock}{练习：}
-		\ttfamily 2.下面程序段运行结束后，K的值是？
+		\ttfamily 2.下面程序段运行结束后，k的值是？
 		\begin{lstlisting}[basicstyle=\small\ttfamily]
         int main() {
             int i, j, k;
