@@ -741,8 +741,7 @@ while (expr) { //条件表达式
 	\frametitle{3.3 循环结构\small{—\texttt{while}语句}}
 	% \framesubtitle{——\texttt{while}语句}
 	\begin{exampleblock}{例3.4：}
-		\ttfamily
-		根据以下公式利用迭代法求~$\pi$~的近似值，最后一项小于或等于~1.0E-10~时停止。\\
+		根据以下公式利用\alert{迭代法}求~$\pi$~的近似值，最后一项小于或等于~1.0E-10~时停止。\\
 		\begin{center}\[\frac{\pi}{2}= 1+\frac{1}{3}+\frac{1}{3}\times\frac{2}{5}+\frac{1}{3}\times\frac{2}{5}\times\frac{3}{7}+\ldots+ x_{i}, ~~x_{i}=x_{i-1}\times\frac{i-1}{2i-1}\]
 		\end{center}
 	\end{exampleblock}
@@ -806,6 +805,7 @@ do{
 \begin{frame}[fragile]
 	\frametitle{3.3 循环结构\small{—\texttt{do while}语句}}
 	% \framesubtitle{——\texttt{do while}语句}
+\vspace{-3mm}
 	\begin{columns}
 		\begin{column}{0.5\textwidth}
 			\begin{exampleblock}{例3.5：}
@@ -984,7 +984,7 @@ for (int i = 1, j = 100; i < j; ++i, --j) {
 		\begin{lstlisting}[basicstyle=\small\ttfamily]
     /*...*/
     int a,b;
-    for(a = 0,b = 5;a <= b+1;a += 2,b--)
+    for(a = 0, b = 5; a <= b+1; a += 2, b--)
         cout << a << endl;
     /*...*/
                     \end{lstlisting}
