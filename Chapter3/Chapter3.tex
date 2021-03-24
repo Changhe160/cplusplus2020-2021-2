@@ -1016,19 +1016,21 @@ for (int i = 1, j = 100; i < j; ++i, --j) {
 	% \framesubtitle{——for 语句}
 	\begin{exampleblock}{练习：}
 		\ttfamily 3.下列语句中，哪一个不是无限循环？
+\vspace{-4mm}
 		\begin{columns}
 			\begin{column}[t]{0.4\linewidth}
 				\begin{lstlisting}[basicstyle=\small\ttfamily]
-A. i=100;
-    while(1)
-    { i=i%100; i++;
-      if (i > 100) break;
+A.  int i=100;
+    while(1){ 
+        i=i%100; 
+        i++;
+        if (i > 100) break;
     }
     \end{lstlisting}
 				\begin{lstlisting}[basicstyle=\small\ttfamily]
 C. short k=32765;
     do {
-        k++; k++;
+        k++; 
     }while(k>0);
 
         \end{lstlisting}
@@ -1256,16 +1258,15 @@ int main(){
 		\begin{lstlisting}[basicstyle=\small\ttfamily]
     int  main(){
         int x(0);
-        for(int i=0; i<2; i++){
+        for(int i = 0; i < 2; i++){
             x++;
-            for(int j=0; j<=3; j++){
-                if(j%2) continue;
+            for(int j = 0; j <= 3; j++){
+                if(j % 2) continue;
                 x++;
             }
             x++;
         }
-        cout<<"x="<<x<<endl;
-        return 0;
+        cout << "x= " << x<< endl;
     }
     \end{lstlisting}\ttfamily
 		A. x = 4~~B. x = 8~~C. x = 6~~D. x = 12\\
@@ -1281,16 +1282,16 @@ int main(){
     int k=0; char c='A';
     do{
         switch(c++){
-            case 'A':k++; break;
-            case 'B':k--;
-            case 'C':k+=2; break;
-            case 'D':k=k%2; continue;
-            case 'E':k=k*10; break;
-            default :k=k/3;
+            case 'A': k++; break;
+            case 'B': k--;
+            case 'C': k += 2; break;
+            case 'D': k= k % 2; continue;
+            case 'E': k = k * 10; break;
+            default : k = k / 3;
         }
         k++;
     } while(c<'G');
-    cout<<"k="<<k<<endl;
+    cout << "k = " << k << endl;
         \end{lstlisting}\ttfamily
 		A.k = 3~~B.k = 4~~C.k = 2~~D.k = 0\\
 		\onslide<2->{答案：B}
@@ -1303,9 +1304,10 @@ int main(){
 	% \begin{block}{}
 	% 对于大多数问题，\alert{单一的语句结构很难解决}，往往\alert{需要语句结构的嵌套}
 	% \end{block}
+\vspace{-2mm}
 	\begin{exampleblock}{例3.7：}
 		\ttfamily 将坐标系顺时针旋转90度，画出~$\sin(x)$~在~$x\in[0,2\pi]$~之间的曲线，如右图所示。\\
-		\alert{提示}：程序主要流程如左图所示\\
+		\alert{提示}：程序主要流程如左图所示
 		%    \ttfamily 1.~step $\leftarrow$ 0.2\\
 		%     2.~while x < 6.28 do\\
 		%     3.~val = 30 * (sin(x)+1)\\
@@ -1321,20 +1323,19 @@ int main(){
 		\begin{column}<2->[b]{0.48\linewidth}
 			\begin{figure}[ht]
 				\centering
-				\includegraphics[scale=0.23]{example3_7.png}
+				\includegraphics[scale=0.3]{example3_7.png}
 				% \caption{程序主要流程}
 				% \label{fig:label}
 			\end{figure}
 		\end{column}
-		\hfill
-
-		\begin{column}[b]{0.48\linewidth}
-			\begin{figure}[ht]
-				\centering
-				\includegraphics[scale=0.17]{Fig3-2.png}
+		
+		\begin{column}[b]{0.48\linewidth}  
+ 				\centering
+				\includegraphics[scale=0.2]{Fig3-2.png}
 				% \caption{\texttt{sin(x)曲线}}
 				% \label{fig:label}
-			\end{figure}
+~~\\
+~~\\			
 		\end{column}
 	\end{columns}
 \end{frame}
