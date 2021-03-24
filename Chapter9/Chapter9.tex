@@ -1,0 +1,1397 @@
+%!TEX program = xelatex
+\documentclass[aspectratio=169,UTF8,11pt]{ctexbeamer}
+
+    \mode<presentation> {
+    \usetheme{Madrid}
+    %\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+    \setbeamertemplate{footline}[frame number] % To replace the footer line in all slides with a simple slide count uncomment this line
+    \setbeamercolor{page number in head/foot}{fg=blue}
+    \setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+    }
+    \usepackage{indentfirst}
+    \setlength{\parindent}{2em}
+    \usepackage{listings}
+    \usepackage{wrapfig}
+    \usepackage{graphicx}
+    \usepackage{marvosym}
+    % \usepackage{fboxrule}
+
+    \definecolor{indiagreen}{rgb}{0.07, 0.53, 0.03}
+    \definecolor{indianred}{rgb}{0.8, 0.36, 0.36}
+    \definecolor{indianyellow}{rgb}{0.89, 0.66, 0.34}
+    \definecolor{bondiblue}{rgb}{0.0, 0.58, 0.71}
+    \definecolor{ao(english)}{rgb}{0.0, 0.5, 0.0}
+    \definecolor{azure(colorwheel)}{rgb}{0.0, 0.5, 1.0}
+    \definecolor{alizarin}{rgb}{0.82, 0.1, 0.26}
+    % User Defined Block %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \newenvironment<>{abstractblock}[1]{%
+      \setbeamercolor{block title}{fg=white,bg=bondiblue}%
+    %   \setbeamercolor{block body}{fg=white,bg=bondiblue}%
+      \begin{block}#2{#1}}{\end{block}}
+
+    \newenvironment<>{adviceblock}[1]{%
+    % \setbeamercolor{block title}{fg=white,bg=bondiblue}%
+      \setbeamercolor{block body}{fg=white,bg=alizarin}%
+    \begin{block}#2{#1}}{\end{block}}
+
+    \newenvironment<>{thinkblock}[1]{%
+      \setbeamercolor{block title}{fg=white,bg=azure(colorwheel)}%
+    %   \setbeamercolor{block body}{fg=white,bg=bondiblue}%
+      \begin{block}#2{#1}}{\end{block}}
+
+    \newenvironment<>{yellowblock}[1]{%
+      \setbeamercolor{block title}{fg=white,bg=indianyellow}%
+      \begin{block}#2{#1}}{\end{block}}
+
+    \lstset{language=C++,
+    columns=flexible,
+    basicstyle=\normalsize\ttfamily,                                    % 设定代码字体、大小
+    %numbers=left,xleftmargin=2em,framexleftmargin=2em,                   % 在左侧显示行号
+    %numberstyle=\color{darkgray},                                        % 设定行号格式
+    keywordstyle=\color{blue},                                            % 设定关键字格式
+    commentstyle=\color{ao(english)},                                     % 设置代码注释的格式
+    stringstyle=\color{brown},                                            % 设置字符串格式
+    showstringspaces=false,                                              % 控制是否显示空格
+    %frame=single,                                                         % 控制外框
+    breaklines,                                                           % 控制是否折行
+    % postbreak=\space,                                                     % 控制折行后显示的标识字符
+    breakindent=5pt,                                                      % 控制折行后缩进数量
+    emph={size\_t,array,deque,list,map,queue,set,stack,vector,string,pair,tuple,ostream,override,final,unique_ptr}, % 非内置类型
+    emphstyle={\color{teal}},
+    escapeinside={(*@}{@*)},
+}
+\usepackage{tikz,tikz-layers}
+
+    \title
+        [第9章~继承与多态\hspace{2em}]
+        {第9章~继承与多态}
+
+    % \author
+    %     []
+    %     {}
+
+    %\date {}
+
+
+    % \institute{}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{代码复用}
+
+\begin{center}
+  \includegraphics[scale=0.5]{Fig/daiblo}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{代码复用}
+
+\begin{tikzpicture}
+\tikzstyle{every node}=[draw,thin, rounded corners, rectangle]
+\tikzstyle{edge from parent}=[blue,thick,draw]
+\tikzstyle{level 1}=[sibling distance=4cm]
+\node (Player){Player(玩家)}
+child {node {Swordsman(剑士)}
+    child {node[blue,text width=3.2cm] {Attack:剑击 \\Special Att:重剑斩}}
+}
+child{node {Archer(弓箭手)}
+    child {node[blue,text width=3.2cm] {Attack:射击 \\Special Att:流星箭}}
+}
+child {node {Mage(法师)}
+     child {node[blue,text width=3.2cm] {Attack:杖击 \\Special Att:吸血术}}
+};
+
+\node(attribute)[draw,thin, rounded corners, rectangle,blue,text width=4cm] at (5,0.7){生命值（Health Point）\\魔法值（Magic Point）\\攻击力（Attack Point）\\防御力（Defense Point）\\经验值（Experience）\\等级（Level）};
+\draw[dashed,->] (Player) -- (attribute);
+
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}
+    {目录}
+    \tableofcontents
+\end{frame}
+
+\begin{frame} {~~}
+    \begin{yellowblock}{学习目标}
+        \begin{itemize}
+            \item 理解继承的内涵和基本语法；
+            \item 掌握拷贝控制成员与继承的关系；
+            \item 掌握并学会运用动态绑定技术。
+        \end{itemize}
+    \end{yellowblock}
+\end{frame}
+
+\section{继承}
+
+\begin{frame}
+    {9.1 继承\small{—定义基类和派生类}}
+    \begin{block}{继承}
+    基类：被继承的类；派生类：通过继承产生的新类
+    \end{block}
+    \begin{exampleblock}{例9.1：}
+        下面设计一个简单的人员系统，包括两类人员：学生（指大学生）和兼职员工。该系统包含以下几个类：Person、Student、PartTimeWorker和Course。
+    \end{exampleblock}
+
+    \begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Fig/Fig9-1.png}
+    \end{figure}
+\end{frame}
+\subsection{定义基类}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—定义基类和派生类}}
+    \begin{exampleblock}{例9.1中定义基类Person：}
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[]
+class Person {                          //人员类
+protected:
+    string m_name;                      //名字
+    int m_age;                          //年龄
+public:
+    Person(const string &name = "", int age = 0):m_name(name), m_age(age){}
+    virtual ~Person() = default;        //default关键字见教材6.2.1节
+    const string& name() const { return m_name; }
+    int age() const { return m_age; }
+    void plusOneYear() { ++m_age; }     //年龄自增
+};
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—定义基类和派生类}}
+    \begin{exampleblock}{例9.1中定义类Course：}
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[]
+class Course {                 //课程类
+    string m_name;             //课程名
+    int m_score;               //成绩
+public:
+    Course(const string &name = "", int score = 0):m_name(name), m_score(score) {}
+    void setScore(int score) { m_score = score; }
+    int score() const { return m_score; }
+    const string& name() const { return m_name; }
+};
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{exampleblock}
+\end{frame}
+\subsection{定义派生类}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—定义基类和派生类}}
+        \begin{block}{}
+    类名后紧随一个冒号，后跟以逗号分隔的基类列表
+    \end{block}
+    \begin{exampleblock}{定义派生类PartTimeWorker（基类访问限定符：public、protected、private）：}
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \vspace{-3mm}
+    \begin{lstlisting}[]
+class PartTimeWorker : public Person {      //兼职人员类，公有继承Person
+private:
+    double m_hour;                          //工作小时数
+    static double ms_payRate;               //每小时工资
+public:
+    PartTimeWorker(const string &name, int age, double h=0): Person(name, age), m_hour(h){}
+    void setHours(double h) { m_hour = h; }
+    double salary() { return m_hour * ms_payRate; }
+};
+double PartTimeWorker::ms_payRate = 7.53;  //静态成员初始化
+    \end{lstlisting}
+       \vspace{-2mm}
+    \end{column}
+    \end{columns}
+    \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—定义基类和派生类}}
+
+    \begin{exampleblock}{定义派生类Student：}
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[]
+class Student : public Person {  //学生类，公有继承Person
+private:
+    Course m_course;                 //课程信息
+public:
+    Student(const string &name, int age, const Course &c):Person(name, age), m_course(c) {}
+    Course& course() { return m_course; }
+};
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—定义基类和派生类}}
+    \begin{yellowblock}{提示：使用关键字\texttt{final}防止被继承}
+    可以利用C++11提供的关键字final来阻止继承的发生：\\
+\begin{lstlisting}[moreemph={final}]
+class NoDerived final { };   //NoDerived不能作为基类被继承
+\end{lstlisting}
+    \end{yellowblock}\vspace{2em}
+
+    \begin{columns}
+    \begin{column}{0.1\textwidth}
+    \begin{beamercolorbox}[rounded=true, shadow=false,wd=0pt]{bgcolor}
+    \includegraphics[scale=0.6]{Fig/question_fig.jpg}
+    \end{beamercolorbox}
+    \end{column}
+
+    \begin{column}{0.9\textwidth}
+    \setbeamercolor{bgcolor}{fg=black,bg=green!50!white}
+    \begin{beamercolorbox}[rounded=true, shadow=false,wd=10cm]{bgcolor}
+    如果我们想让例9.1中派生类Student和PartTimeWorker不再被任何类继承，我们应该如何做？
+    \end{beamercolorbox}
+     \end{column}
+    \end{columns}
+\end{frame}
+
+\subsection{访问控制}
+
+\begin{frame}
+    {9.1 继承\small{—访问控制}}
+    \begin{block}{派生类访问基类成员：private VS public}
+  private 只能在类内部访问（i.e., 派生类无权访问基类成员）， 而 public又失去了隐私保护
+    \end{block}
+
+    \begin{block}<2->{访问限定声明}
+    \begin{center}
+      \begin{tabular}{|c|cccc|}
+      \hline
+      & a & b& c& d \\ \hline
+      访问位置& 该类成员函数 & 派生类成员函数 & 该类友元 & 该类对象 \\
+      \hline
+    \end{tabular}
+    \end{center}
+
+
+    \begin{itemize}
+    \item \textcolor[rgb]{0,0,1}{\texttt{public}} :可以被a、b、c和d访问。
+    \item \textcolor[rgb]{1,0,0}{\texttt{protected}} :可以被a、b和c访问。
+    \item \textcolor[rgb]{0,0,1}{\texttt{private}}:可以被a和c访问。
+    \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—访问控制}}
+    \begin{block}{下面代码正确吗？}
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+       \vspace{-4mm}
+    \begin{lstlisting}[]
+class Base {
+    private:    int m_pri;          //private成员
+    protected:    int m_pro;        //protected成员
+    public:    int m_pub;           //public成员
+};
+class PubDerv : public Base {
+    void foo() {        //派生类成员函数
+        m_pri = 10;     //错误：不能访问Base类私有成员
+        m_pro = 1;      //正确：可以访问Base类受保护成员
+    }
+};
+void test() {           //全局函数
+    Base b;             //类对象
+    b.m_pro = 10;        //错误：不能访问Base类受保护成员
+}
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    {9.1 继承\small{—访问控制}}
+    \begin{block}{三类继承方式}
+    \begin{itemize}
+    \item \textcolor[rgb]{0,0,1}{\texttt{public}}~继承 :基类的protected和public属性在其派生类中\alert{保持不变}。
+    \item \textcolor[rgb]{0,0,1}{\texttt{protected}}~继承 :基类的protected和public属性在派生类中变为protected。
+    \item \textcolor[rgb]{0,0,1}{\texttt{private}}~继承:基类的protected和public属性在派生类中变为private。
+    \end{itemize}
+    \end{block}
+    \pause
+       \begin{block}{访问权限不仅取决于访问限定符，还取决于继承方式}
+    以上三种继承，基类中的private属性在其派生类中均\alert{保持不变}。
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—访问控制}}
+    \begin{block}{下面代码正确吗？}
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \vspace{-2mm}
+    \begin{lstlisting}[basicstyle=\footnotesize]
+class PriDerv : private Base {  //私有继承不影响派生类成员对 基类的访问
+    void foo() {
+        m_pro = 1;      //正确：可以访问Base类受保护成员
+        m_pub = 1;      //正确：可以访问Base类公有成员
+    }
+};
+void test() {
+    PubDerv d1;
+    d1.m_pub = 10;       //正确：m_pub在PubDerv中是公有的
+    PriDerv d2;
+    d2.m_pub = 1;        //错误：m_pub在PriDerv中是私有的
+}
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{block}
+        \begin{yellowblock}{提示：公有继承是主流}
+    由于私有继承和受保护继承均具有\alert{局限性}，所以公有继承是主流的继承方式。
+    \end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—访问控制}}
+    \begin{block}{使用using声明}
+        通过使用using声明，可以\alert{改变}派生类中基类成员的访问权限：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[]
+class PubDerv : public Base {
+public:
+    using base::m_pro;          //声明为公有的
+};
+void test() {
+    PubDerv d;
+    d.m_pro;                    //正确
+}
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{block}
+    \begin{alertblock}{注意：}
+    派生类只能为它可以访问的名字提供using声明。
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—访问控制}}
+    \begin{block}{命名冲突}
+        定义在派生类（内层作用域）的名字将会\alert{屏蔽掉基类（外层作用域）的同名成员}：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[]
+class Base {
+    protected:    int m_data;
+    public:    void foo(int) { /*...*/ }
+};
+class Derived : public Base {
+protected:
+    int m_data;                         //基类m_data被隐藏
+public:
+    int foo() {                         //基类foo成员被隐藏
+        return m_data;                  //返回Derived::m_data
+    }
+};
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—访问控制}}
+    \begin{block}{命名冲突}
+        如果在派生类里面需要访问基类的同名成员，则可以使用基类的\alert{作用域运算符}：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.45\linewidth}
+    \begin{lstlisting}[]
+class Derived : public Base {
+    /*...*/
+    int foo() {
+        return Base::m_data;
+    }
+};
+    \end{lstlisting}
+    \end{column}
+        \begin{column}{0.48\linewidth}
+    \begin{lstlisting}[]
+ Base b;
+ Derived d;
+ b.foo(10);//ok:调用Base::foo
+ d.foo(); //ok:调用Derived::foo
+ d.foo(10);//错误:Base::foo被隐藏
+    \end{lstlisting}
+    \end{column}
+    \end{columns}
+    \end{block}
+
+    \setbeamercolor{bgcolor}{fg=black,bg=green!50!white}
+    \begin{beamercolorbox}[rounded=true, shadow=false,wd=10cm]{bgcolor}
+    如果我们想调用基类中的foo函数，我们应该如何做？
+    \end{beamercolorbox}
+\begin{columns}
+\begin{column}{0.47\textwidth}
+\begin{lstlisting}<2->[]
+d.Base::foo(10);//正确
+class Derived: public Base{
+public:
+\end{lstlisting}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{lstlisting}<2->[]
+    using Base::foo;
+};
+d.foo(10); //正确
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\subsection{类型转换}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—类型转换}}
+    \begin{block}{派生类到基类的转换}
+         一个派生类不仅包含自己定义的（非静态）成员，而且还包含其从基类继承的成员。因此，可以将派生类对象当成基类对象使用，也就是说可以将基类的\alert{指针}或\alert{引用}与派生类对象\alert{绑定}，例如：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[moreemph={PartTimeWorker,Person}]
+PartTimeWorker w("Kevin", 21);
+Person p, *ptr;
+ptr = &w;                        //基类指针ptr指向派生类对象w
+Person &p2 = w;                  //基类引用绑定到派生类对象w
+p = w;                           //派生类对象赋值给基类对象
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.1 继承\small{—类型转换}}
+    \begin{block}{派生类到基类的转换}
+         虽然派生类可以自动转换为基类的引用或指针，但没有从基类到派生类的自动转换。这是因为基类对象不能提供派生类对象\alert{新定义的部分}，例如：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[moreemph={PartTimeWorker}]
+PartTimeWorker *w2 = &p;             //错误：不能将基类转换为派生类
+w = p;                               //错误：不能将基类转换为派生类
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \pause
+    \end{columns}
+        派生类与基类关系IS-A，即用派生类对象来创建一个基类对象：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[moreemph={PartTimeWorker,Person}]
+PartTimeWorker w("Kevin", 21);       //派生类对象
+Person p(w);                         //利用派生类对象构造基类对象
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \pause
+        如果派生类以私有方式或受保护的方式继承基类，那么派生类将\alert{不能自动转换}为基类类型，例如：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}\vspace{-2mm}
+    \begin{lstlisting}[moreemph={PriDerv,Base}]
+PriDerv d;                           //priDerv私有继承Base
+Base b(d);                           //错误：PriDerv不能转换为Base
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    {9.1 继承\small{—类型转换}}
+    \begin{yellowblock}{提示：从派生类到基类的转换原则}
+        理解从派生类到基类的\alert{隐式自动转换}需要明白三点：
+    \begin{itemize}
+    \item 这种转换只限于指针或引用类型;
+    \item 转换的前提是公有继承；
+    \item 没有从基类到派生类的隐式自动转换。
+    \end{itemize}
+    \end{yellowblock}
+\end{frame}
+
+\section{构造、拷贝控制与继承}
+
+\begin{frame}[fragile]
+    {9.2 构造、拷贝控制与继承}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{Fig/Constr-Destr.png}
+\end{figure}
+
+构造顺序：\uncover<2->{B} \uncover<3->{D1} \uncover<4->{D2} \uncover<5->{D3}\uncover<6->{(c1} \uncover<7->{c2} \uncover<8->{c3)}
+
+析构顺序：\uncover<9->{D3}\uncover<10->{(c3} \uncover<11->{c2} \uncover<12->{c1)} \uncover<13->{D2} \uncover<14->{D1} \uncover<15->{B}
+
+\end{frame}
+\subsection{派生类对象的构造}
+
+\begin{frame}[fragile]
+    {9.2 构造、拷贝控制与继承\small{—派生类对象的构造}}
+    \begin{block}{派生类Student对象的构造}
+        以上述Student类为例：
+    \begin{columns}
+
+    \begin{column}{\linewidth}
+    \begin{lstlisting}[]
+Student::Student(const string &name,int age,const Course &c): Person(name, age),/*初始化基类成员*/ m_course(c)/*初始化自有成员*/ {
+    cout<<"Constr of Student"<<endl;
+}
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+        Student类中成员m\_course以复制构造的方式初始化。如下：
+    \begin{columns}
+
+    \begin{column}{\linewidth}
+    \begin{lstlisting}[]
+Course::Course(const Course &rhs): m_name(rhs.name),   m_score(rhs.m_score) {
+    cout<< "Copy constr of Course" <<endl;
+}
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{block}
+\end{frame}
+\subsection{拷贝控制与继承}
+
+
+\begin{frame}[fragile]
+    {9.2 构造、拷贝控制与继承\small{—派生类对象的构造}}
+    \begin{block}{派生类Student对象的构造}
+
+    \begin{columns}
+
+    \begin{column}{\linewidth}
+    \begin{lstlisting}[]
+Person::Person(const string &name = "",int age = 0):m_name(name), m_age(age) {
+    cout<<"Constr of Person"<<endl; // 为Person类初始化添加标记：
+}
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+        当创建Student类对象时：       \verb+Student s("Kevin", 19, Course("Math"));+\\\vspace{0.5em}
+        输出结果：\\\vspace{0.5em}
+        \verb;Constr of Person;\\
+        \verb;Copy constr of Course;\\
+        \verb;Constr of Student;\\
+    \end{block}
+    \pause
+    \begin{yellowblock}{提示：存在继承关系的类的成员初始化}
+        在派生类对象构造过程中，每个类\alert{仅负责}自己的成员的初始化。
+    \end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.2 构造、拷贝控制与继承\small{—拷贝控制与继承}}
+    \begin{block}{析构与继承}
+        类似于构造函数，Course、Student和Person类的析构函数的函数如下：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[moreemph={Person,Student,Course}]
+Person::~Person() {    cout<< "Destr of Person" <<endl;  }
+Student::~Student() {    cout<< "Destr of Student" <<endl; }
+Course::~Course() {    cout<< "Destr of Course" <<endl;  }
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+        利用如下代码创建Student类对象：\\\vspace{0.5em}
+            \begin{lstlisting}[moreemph={Person,Student,Course}]
+        Course c("Math");
+        {
+            Student s("Kevin", 19, c); (*@{\texttt{//}\alert{思考}：输出结果会是怎样的？ }@*)
+        }
+\end{lstlisting}\ttfamily
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.2 构造、拷贝控制与继承\small{—拷贝控制与继承}}
+    \begin{block}{析构与继承}
+        ~~输出结果：\\\vspace{0.5em}
+        ~~Destr of Student\\
+        ~~Destr of Course\\
+        ~~Destr of Person\\
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.2 构造、拷贝控制与继承\small{—拷贝控制与继承}}
+    \begin{block}{复制、移动与继承}
+        一个派生类对象在\alert{复制}或\alert{移动}的时候，除复制或移动自有成员外，还要复制或移动基类部分的成员。因此，通常在复制或移动构造函数的初始化列表中调用基类的\alert{复制或移动构造函数}。
+
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}\vspace{-2mm}
+    \begin{lstlisting}[]
+class A{/*...*/};
+class B : public A {
+    string m_d;
+public:
+    B(const B &d):A(d), m_d(d.m_d){    }
+    B(B &&d):A(std::move(d)),m_d(std::move(d.m_d)){   }
+};
+    \end{lstlisting}
+    \visible<2->{
+        \begin{tikzpicture}[remember picture,overlay]
+          \node[text=red](ca) at(5,2.5){复制A的成员};
+          \node[text=red](cb) at(8,2.5){复制B的成员};
+          \node[text=red](ma) at(5,0){移动A的成员};
+          \node[text=red](mb) at(8,0){移动B的成员};
+          \draw[->,red,line width =1.pt] (ca)-- (4,2);
+          \draw[->,red,line width =1.pt] (cb)-- (6,2);
+          \draw[->,red,line width =1.pt] (ma)-- (4,1);
+          \draw[->,red,line width =1.pt] (mb)-- (8,1);
+    \end{tikzpicture} }
+    \vspace{-6mm}
+    \end{column}
+
+    \end{columns}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.2 构造、拷贝控制与继承\small{—拷贝控制与继承}}
+    \begin{block}{赋值与继承}
+        与复制和移动构造函数类似，必须在派生类的赋值运算符中\alert{显式}调用基类的赋值运算符，才能正确地完成基类成员的赋值：
+    \begin{columns}
+    \begin{column}{0.06\linewidth}
+    \end{column}
+    \begin{column}{0.94\linewidth}
+    \begin{lstlisting}[]
+B& B::operator=(const B &d) {
+    if(this == &d) return *this;
+    A::operator=(d);                  //赋值A的成员
+    m_d = d.m_d;                      //赋值自身成员
+    return *this;
+}
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+    \end{block}
+    \pause
+    \begin{yellowblock}{提示：派生类中使用基类的构造或赋值成员}
+   如果基类中合成的构造函数、复制构造函数或赋值运算符是删除的或者是不可以访问的，那么派生类中对应的合成成员也是删除的。
+    \end{yellowblock}
+\end{frame}
+
+\section{虚函数与多态性}
+\subsection{虚函数}
+
+\begin{frame}[fragile]{9.3 虚函数与多态性}
+    \begin{block}{思考}
+    \begin{center}
+    \scalebox{1.5}{ 如果基类成员的实现在派生类里面不再适用，怎么办？}
+    \end{center}
+    \pause
+    \begin{lstlisting}
+class Animal{
+    public:
+        void eat() { std::cout << "I'm eating generic food."; }
+};
+
+class Cat : public Animal{
+    public:
+        void eat() { std::cout << "I'm eating a rat."; }
+};
+\end{lstlisting}
+    \end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]{9.3 虚函数与多态性}
+    \begin{block}{}
+    \begin{center}
+    \begin{tikzpicture}[grow=right]
+      \tikzstyle{every node}=[fill=red!30,rounded corners,minimum size=0.5cm,inner sep=0pt]
+      \tikzstyle{edge from parent}=[red,thick,draw]
+      \node{\scalebox{1.2}{C++多态}}[level distance=30mm]
+      child{[level distance=40mm,text=blue] node {\scalebox{1.2}{运行时多态}}
+        child{node{\scalebox{1.2}{继承与虚函数}}}}
+      child[missing]
+      child{[level distance=30mm] node {编译时多态}
+        child{node{函数重载}}
+        child{node{模板实例}}
+        };
+    \end{tikzpicture}
+    \end{center}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—动态绑定}}
+    \begin{block}{静态类型}
+    指对象声明时的类型或表达式生成时的类型，在编译时就已经确定，例如：
+   \begin{lstlisting}[moreemph={Base}]
+    class Base { }
+    Base *p;        //指针p的静态类型为Base
+    \end{lstlisting}\ttfamily
+    \end{block}
+    \pause
+    \begin{block}{动态类型}
+    指\alert{指针或引用}所绑定的对象的类型，仅在运行时可知，例如：
+    \begin{lstlisting}[moreemph={Base,Derived}]
+    class Derived : public Base { };
+    Derived d;      //非指针或引用，动态类型与静态类型相同
+    Base *p = &d;   //指针p的动态类型为Derived
+    \end{lstlisting}\ttfamily
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—虚函数}}
+     \begin{columns}
+      \begin{column}{0.52\linewidth}
+    \begin{block}{Shape类}
+   \vspace{-3mm} \begin{lstlisting}[basicstyle=\footnotesize]
+class Shape {
+protected:    string m_name;
+public:
+    Shape(const string &s = ""):m_name(s) { }
+    //虚函数
+    (*@{\alert{virtual}}@*)  double (*@{\alert{area}}@*)() const { return 0; }
+    const string& name() { return m_name; }
+};
+    \end{lstlisting}\vspace{-2mm}\ttfamily
+    \end{block}
+     \end{column}
+      \pause
+    \begin{column}{0.44\linewidth}
+    \begin{block}{Circle类}
+    \vspace{-3mm}\begin{lstlisting}[basicstyle=\footnotesize]
+class Circle : public Shape {
+private:    double m_rad;
+public:
+    Circle(double r=0, const string &s = ""):Shape(s),m_rad(r) { }
+    double (*@{\alert{area}}@*)() const {
+        return 3.1415926*m_rad*m_rad; }
+};
+    \end{lstlisting}\vspace{-2mm}\ttfamily
+    \end{block}
+     \end{column}
+    \end{columns}
+    \pause
+     \begin{block}{Square类}
+    \vspace{-3mm}\begin{lstlisting}[basicstyle=\footnotesize]
+class Square : public Shape {
+private:    double m_len;
+public:
+    Square(double l=0, const string &s = ""):Shape(s),m_len(l) {}
+    double (*@{\alert{area}}@*)() const { return m_len*m_len; }
+};
+    \end{lstlisting}\vspace{-2mm}
+    \end{block}
+\end{frame}
+
+
+\subsection{动态绑定}
+
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—动态绑定}}
+    \begin{block}{动态绑定}
+    除需要重写基类的虚函数外，还必须用\alert{基类的指针或引用}才能触发动态绑定
+    \end{block}
+    \pause
+     \begin{block}{利用指针触发动态绑定}
+     \vspace{-4mm}
+         \begin{tikzpicture}[overlay]
+      \draw[dashed,thin,blue] (8,0)--(8,-2.15);
+    \end{tikzpicture}
+     \begin{columns}
+     \column{0.5 \textwidth}
+     \begin{lstlisting}[moreemph={Shape,Square,Circle}]
+Shape sh, *p = &sh; //p指向Shape类对象
+Square sq(1.0);
+cout<<p->area()<<endl; //打印输出0
+    \end{lstlisting}\ttfamily
+
+    \column{0.45 \textwidth}
+     \begin{lstlisting}[moreemph={Shape,Square,Circle}]
+p = &sq;       //p的动态类型为Square
+cout<<p->area(); //打印输出1.0
+    \end{lstlisting}\ttfamily
+     \end{columns}
+
+    \end{block}
+
+     \pause
+      \begin{block}{利用引用触发动态绑定}\vspace{-3mm}
+      \begin{tikzpicture}[overlay]
+      \draw[dashed,thin,blue] (8,-1.1)--(8,-2.4);
+    \end{tikzpicture}
+
+ \begin{lstlisting}[moreemph={Shape,Square,Circle}]
+bool operator>(const Shape &a, const Shape &b){return a.area()>b.area();}
+    \end{lstlisting}
+        \vspace{-4mm}
+    \begin{columns}
+     \column{0.5 \textwidth}
+     \begin{lstlisting}[moreemph={Shape,Square,Circle}]
+Shape *p = nullptr;
+Square sq(2.0);
+Circle ci(1.2);
+    \end{lstlisting}
+
+    \column{0.45 \textwidth}
+     \begin{lstlisting}[moreemph={Shape,Square,Circle}]
+if(sq>ci)
+    p = &sq;
+cout<<p->area()<<endl;
+    \end{lstlisting}
+     \end{columns}
+
+
+    \vspace{-2mm}
+    \end{block}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—动态绑定}}
+    \begin{block}{虚析构函数}
+   通常情况下，基类的析构函数应该是虚函数，保证正确delete一个动态派生类对象，例如：
+\begin{lstlisting}[moreemph={Shape,Square,Circle}]
+    class Shape {
+    public:
+        virtual ~Shape() {  cout<<"Destr of Shape"<<endl;   }
+    };
+    class Circle : public Shape {
+    public:
+        ~Circle() {   cout<<"Destr of Circle"<<endl;  }
+    };
+    Shape *p = new Circle();
+    delete p; //输出Destr of Circle~~Destr of Shape
+    \end{lstlisting}\ttfamily
+    \end{block}
+    \pause
+    \alert{注意}:如果基类析构函数为非虚函数，则delete一个指向派生类对象的基类指针将产生未定义的行为
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—动态绑定}}
+    \begin{block}{注意}
+    \begin{itemize}[<+->]%<+(2)->
+    \item 动态绑定必须通过基类\alert{指针}或\alert{引用}绑定到派生类对象才能触发。
+    \item 派生类中与基类虚函数对应的重写版本\alert{自动为虚函数}，不必进行virtual声明。
+    \item \alert{内联成员、静态成员和模板成员}均不能声明为虚函数\scalebox{1.5}{\Frowny{}}。
+    \item 派生类版本的声明必须与基类版本的声明完全一致，包括\alert{函数名、形参列表和返回值类型}。
+     \item 动态绑定的实现是有代价的，大量的虚函数会导致程序性能的下降。
+    \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—动态绑定}}
+\vspace{-8mm}
+\begin{columns}[t]
+\column{0.7\textwidth}
+    \begin{block}{}
+    \vspace{-3mm}\begin{lstlisting}[moreemph={Base,Derived}]
+class Base{
+public:
+    virtual Base* foo() { cout << "Base" << endl; return this; }
+};
+class Derived : public Base{
+public:
+    Derived* foo() { cout << "Derived" << endl; return this; }
+};
+void test() {
+    Derived d;
+    Base *p = &d;
+    p->foo();
+    d.foo();
+}
+    \end{lstlisting}\vspace{-3mm}
+    \end{block}
+\column{0.25\textwidth}
+    \begin{block}{例外}
+    基类版本返回基类指针或引用，派生类版本可以返回派生类指针或引用
+    \end{block}
+    \begin{block}<2->{调用\texttt{test}函数输出}
+    \texttt{Derived}\\\texttt{Derived}
+    \end{block}
+    \end{columns}
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—动态绑定}}
+\vspace{-8mm}
+\begin{columns}[t]
+\column{0.7\textwidth}
+    \begin{block}{}
+    \vspace{-3mm}\begin{lstlisting}[moreemph={Base,Derived}]
+class Base{
+public:
+    virtual void fun(int i=0) {
+        cout << "Base:" << i << endl; }
+};
+class Derived : public Base{
+public:
+    void fun(int i=1) {
+        cout << "Derived:" << i << endl; }
+};
+void test(){
+    Derived d;
+    Base *p = &d;
+    p->fun();
+    d.fun();
+}
+    \end{lstlisting}\vspace{-3mm}
+    \end{block}
+    \column{0.25\textwidth}
+    \begin{block}{注意}
+    如果参数具有默认值，则各个版本中对应形参的\alert{默认值必须相同}\\
+    \end{block}
+
+    \begin{block}<2->{调用\texttt{test}函数输出}
+    \texttt{Derived:0}\\\texttt{Derived:1}
+    \end{block}
+    \end{columns}
+
+    \vspace{2mm}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—动态绑定}}
+    \begin{block}{final和override说明符}
+   C++11~引入了关键字~override\index{O!override}~用来\alert{显式}说明派生类的函数要覆盖基类的虚函数。类似的，可以使用关键字~final\index{F!final}~\alert{阻止}派生类覆盖基类版本的虚函数。
+\begin{lstlisting}[basicstyle=\footnotesize,moreemph={B,D1,D2}]
+struct B {
+    virtual void fun1(int) { }
+    virtual void fun2() { }
+    void fun3() { }
+};
+struct D1 : public B {
+    void fun1() override { }   //错误：基类没有不带参数的fun1函数
+    void fun2() final { }        //D1::fun2为最终版本
+    void fun3() override { }   //错误：基类没有可覆盖的函数
+};
+struct D2 : public D1 {
+    void fun2() { }            //错误：不允许覆盖基类D1中的fun2函数
+};
+    \end{lstlisting}\ttfamily
+    \end{block}
+\end{frame}
+\subsection{抽象类}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—抽象类}}
+    \begin{block}{纯虚函数}
+    ~~~~~~上面定义的~Shape~类，实际上并不代表具体的几何形状类，因此它的成员函数~area~的定义是没有意义的，Shape~类只是几何形状的一个抽象，因此也不希望用户创建一个~Shape~类对象。C++~允许将这样的虚函数声明为\alert{纯虚函数}：\vspace{-2mm}
+\begin{lstlisting}[moreemph={Shape}]
+    class Shape {
+    public:
+        virtual double area() const = 0;      //纯虚函数
+    }
+    Shape sh;                //错误：不能创建抽象类的实例
+    \end{lstlisting}\vspace{-2mm}
+    \pause
+    \end{block}
+        \begin{yellowblock}{提示：公有继承方式下的基类成员函数的继承与覆盖}
+    \begin{itemize}
+    \item 不要重新定义基类非虚函数
+    \item 如果需要重新定义基类函数，则该函数应声明为虚函数
+    \item 派生类继承基类\alert{非虚函数的接口和实现、虚函数的接口和默认实现、纯虚函数的接口}
+    \end{itemize}
+    \end{yellowblock}
+\end{frame}
+
+
+\subsection{继承与组合}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—继承与组合}}
+
+    \begin{columns}
+    \begin{column}{0.48\linewidth}
+    \begin{block}{Cat类}
+    \begin{lstlisting}[moreemph={Cat}]
+    class Cat {
+    protected:
+        string m_name;
+    public:
+        void meow() {     //喵喵叫
+            cout<<"meowing"<<endl;
+        }
+    };
+    \end{lstlisting}\ttfamily
+    \end{block}
+    \end{column}
+
+    \begin{column}{0.48\linewidth}
+    \begin{block}{Dog类}
+    \begin{lstlisting}[moreemph={Dog}]
+    class Dog {
+    protected:
+        string m_name;
+    public:
+        void bark() {     //汪汪叫
+            cout<<"barking"<<endl;
+        }
+    };
+    \end{lstlisting}\ttfamily
+    \end{block}
+     \end{column}
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—继承与组合}}
+
+    \begin{columns}
+    \begin{column}{0.48\linewidth}
+    \begin{block}{IS-A设计}
+    \begin{lstlisting}[moreemph={Dog,Cat}]
+    class Dog : public Cat {
+    public:
+        void bark();
+    };
+    Dog dog;        //创建一个Dog类对象
+    dog.bark();     //调用bark函数
+    \end{lstlisting}\ttfamily
+    虽然dog能汪汪叫，但是它也会喵喵叫，显然这是\alert{不符合}事实的。Dog不是一种Cat，显然\alert{不是属于关系}。
+     \end{block}
+    \end{column}
+    \pause
+    \begin{column}{0.48\linewidth}
+    \begin{block}{HAS-A设计}
+    \begin{lstlisting}[moreemph={Dog,Cat}]
+    class Dog {
+        Cat m_cat;
+    public:
+        void bark();
+    };
+    Dog dog;        //创建一个Dog类对象
+    dog.bark();     //调用bark函数
+    \end{lstlisting}\ttfamily
+    虽然dog不能喵喵叫了，但\alert{不符合自然逻辑}。Dog和Cat类显然\alert{不是组合关系}。
+     \end{block}
+    \end{column}
+    \end{columns}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—继承与组合}}
+    \begin{block}{抽象共有属性}
+    将Cat和Dog共有的属性\alert{抽象}，包括名字和发声行为，形成一个新的公共基类Mammal
+    \end{block}
+
+\begin{columns}
+\begin{column}{0.31\linewidth}
+\begin{lstlisting}[basicstyle=\footnotesize,moreemph={Mammal,Dog,Cat}]
+class Mammal {
+protected:
+    string m_name;
+public:
+    virtual void sounding() = 0;
+};
+\end{lstlisting}\ttfamily
+\end{column}
+    \pause
+\begin{column}{0.31\linewidth}
+\begin{lstlisting}[basicstyle=\footnotesize,moreemph={Mammal,Dog,Cat}]
+class Cat : public Mammal {
+protected:
+    void meow();
+public:
+    void sounding() override { meow(); }
+};
+\end{lstlisting}\ttfamily
+\end{column}
+ \pause
+\begin{column}{0.31\linewidth}
+\begin{lstlisting}[basicstyle=\footnotesize,moreemph={Mammal,Dog,Cat}]
+class Dog : public Mammal {
+protected:
+    void bark();
+public:
+    void sounding() override { bark(); }
+};
+\end{lstlisting}\ttfamily
+\end{column}
+\end{columns}
+
+  \pause
+    \begin{lstlisting}[basicstyle=\footnotesize,moreemph={Mammal,Dog,Cat}]
+Dog dog;
+Cat cat;
+dog.sounding();  //dog能正常的汪汪叫
+cat.sounding();  //cat能正常的喵喵叫
+    \end{lstlisting}
+    \pause
+  \begin{itemize}
+    \item 既统一了接口，又实现了不同的行为。
+    \item  符合事实和自然逻辑。
+  \end{itemize}
+\end{frame}
+
+\subsection{再探计算器}
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—再探计算器}}
+    \begin{thinkblock}{思考:}
+    在前面章节，利用链栈实现了一个简单的计算器程序。经过学习本章节后，如何利用OOP思想重新设计与实现计算机程序？
+    \end{thinkblock}\vspace{4em}
+    %\begin{beamercolorbox}[rounded=true, shadow=false,wd=0pt]{bgcolor}
+    \includegraphics[scale=0.6]{Fig/question_fig.jpg}
+    %\end{beamercolorbox}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—再探计算器}}
+    \begin{block}{定义运算符基类}
+    把每一种运算符抽象成一个类，再把运算符的\alert{共有属性抽象}出来，形成一个公共基类Operator。运算符继承关系如下：
+    \end{block}
+    \begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{Fig/Operator.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—再探计算器}}
+    \begin{block}{定义运算符基类}
+    \vspace{-4mm}
+\begin{lstlisting}[]
+class Operator{
+public:
+    Operator(char c, int numOprd, int pre) :m_symbol(c), m_numOprand(numOprd), m_precedence(pre){}
+    char symbol() const { return m_symbol; }
+    int numOprand() const { return m_numOprand; }
+    int precedence() const { return m_precedence; };
+    virtual double get(double a, double b) const = 0;
+    virtual ~Operator() {}
+protected:
+    const char m_symbol;            //符号
+    const int m_numOprand;          //目数
+    const int m_precedence;         //优先级
+};
+    \end{lstlisting}\ttfamily
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—再探计算器}}
+    \begin{columns}
+    \begin{column}{0.48\textwidth}
+    \begin{block}{定义运算符类}
+\begin{lstlisting}[basicstyle=\scriptsize]
+class Plus : public Operator{       //运算符 +
+public:
+    Plus() :Operator('+', 2, 2) {}
+    double get(double a, double b) const {
+        return a + b; }
+};
+class Minus :public Operator{       //运算符 -
+public:
+    Minus() :Operator('-', 2, 2) {}
+    double get(double a, double b) const {
+        return a - b; }
+};
+class Multiply :public Operator{    //运算符 *
+public:
+    Multiply() :Operator('*', 2, 3) {}
+    double get(double a, double b) const {
+        return a * b; }
+};
+    \end{lstlisting}\ttfamily
+    \end{block}
+    \end{column}
+     \begin{column}{0.48\textwidth}
+         \begin{block}{定义运算符类}
+\begin{lstlisting}[basicstyle=\scriptsize]
+class Divide :public Operator{          //运算符 /
+public:
+    Divide() :Operator('/', 2, 3) {}
+    double get(double a, double b) const {
+        return a / b; }
+};
+class Hash :public Operator{            //运算符 #
+public:
+    Hash() :Operator('#', 1, 1) {}      //无实际意义
+    double get(double a, double b) const {
+        return a; }
+};
+class Equal :public Operator{           //结束符 =
+public:
+    Equal() :Operator('=', 2, 0) {}     //无实际意义
+    double get(double a, double b) const {
+        return a; }
+};
+    \end{lstlisting}\ttfamily
+    \end{block}
+    \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—再探计算器}}
+    \begin{block}{定义计算器类-通过运算符栈保存基类指针实现动态绑定}
+    \begin{lstlisting}[moreemph={Stack,Operator}]
+class Calculator {
+private:
+    Stack<double> m_num;                        //操作数栈
+    Stack<unique_ptr<Operator>> m_opr;          //运算符数栈，利用智能指针管理内存
+    void calculate();
+    //成员函数readNum和isNum与前面章节定义的相同
+public:
+    Calculator(){
+        m_opr.push(make_unique<Hash>());        //调用移动push函数
+    }
+    double doIt(const string &exp);
+};
+ \end{lstlisting}\ttfamily
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—再探计算器}}
+    \begin{block}{定义计算器类}
+\begin{lstlisting}[moreemph={Calculator,Operator,Plus,Minus,Multiply,Divide,Equal}]
+void Calculator::calculate(){   //操作数出栈并进行相应计算
+    double a[2] = {0};
+    for (auto i = 0; i < m_opr.top()->numOprand(); ++i) {
+        a[i] = m_num.top();
+        m_num.pop();
+    }
+    m_num.push(m_opr.top()->get(a[1],a[0]));//触发动态绑定，并将计算结果压栈
+    m_opr.pop();
+}
+    \end{lstlisting}\ttfamily
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—再探计算器}}
+    \begin{block}{定义计算器类}
+    \begin{columns}
+    \begin{column}{0.48\textwidth}
+    \begin{lstlisting}[basicstyle=\scriptsize,moreemph={Operator,Plus,Minus,Multiply,Divide,Equal}]
+double Calculator::doIt(const string &exp){
+    for (auto it = exp.begin(); it != exp.end();){
+        if (isNum(it))
+            m_num.push(readNum(it));
+        else{
+            char o = *it++;
+            unique_ptr<Operator> oo; //定义基类指针
+            if (o == '+')
+                oo = make_unique<Plus>();
+            else if (o == '-')
+                oo = make_unique<Minus>();
+            else if (o == '*')
+                oo = make_unique<Multiply>();
+            else if (o == '/')
+                oo = make_unique<Divide>();
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \begin{column}{0.48\textwidth}
+    \begin{lstlisting}[basicstyle=\scriptsize]
+            else if (o == '=')
+                oo = make_unique<Equal>();
+            while (oo->precedence()<=m_opr.top()->precedence()){
+                if (m_opr.top()->symbol() == '#')
+                    break;
+                calculate();
+            }
+            if( oo->symbol() != '=')
+                m_opr.push(std::move(oo));
+        }
+    }
+    double result = m_num.top();
+    m_num.pop();
+    return result;
+}
+    \end{lstlisting}\ttfamily
+    \end{column}
+    \end{columns}
+
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    {9.3 虚函数与多态性\small{—再探计算器}}
+    \begin{block}{增加移动语义}
+    由于unique\_ptr不支持复制操作，因此向前面章节定义的Node模板和Stack模板分别添加支持移动语义的构造函数和push函数：
+\begin{lstlisting}[basicstyle=\normalsize\ttfamily,moreemph={Node, T,Stack}]
+template<typename T>                // 含右值形参的移动构造函数
+Node<T>::Node(T &&val) :m_value(std::move(val)) { }
+
+template<typename T>
+void Stack<T>::push(T &&val) {       //含右值形参的push函数
+    Node<T> *node = new Node<T>(std::move(val));
+    node->m_next = m_top;
+    m_top = node;
+}
+\end{lstlisting}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{~~}
+\begin{center}
+  {\huge{本章结束}}
+  \begin{block}{上机作业}
+ \begin{enumerate}
+   \item 实验指导书：第九章
+   \item 检查日期：
+   \item 地点：与助教协商
+ \end{enumerate}
+\end{block}
+\end{center}
+\end{frame}
+
+\end{document} 
