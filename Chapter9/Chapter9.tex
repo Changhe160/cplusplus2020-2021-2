@@ -81,6 +81,16 @@
 \maketitle
 
 \begin{frame}{代码复用}
+\begin{itemize}
+  \item<1-> 函数---面向过程: $void ~fun()\{\}$
+  \item<2-> 类---基于对象: $class ~mytype\{\};$
+  \item<3-> 模板---泛型编程 : $template<typename ~T>$
+  \item<4-> 继承---面向对象 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{继承}
 
 \begin{center}
   \includegraphics[scale=0.5]{Fig/daiblo}
@@ -88,7 +98,7 @@
 
 \end{frame}
 
-\begin{frame}{代码复用}
+\begin{frame}{继承}
 
 \begin{tikzpicture}
 \tikzstyle{every node}=[draw,thin, rounded corners, rectangle]
@@ -300,6 +310,7 @@ class NoDerived final { };   //NoDerived不能作为基类被继承
 
 \begin{frame}[fragile]
     {9.1 继承\small{—访问控制}}
+    \vspace{-2mm}
     \begin{block}{下面代码正确吗？}
     \begin{columns}
     \begin{column}{0.06\linewidth}
@@ -558,12 +569,14 @@ Base b(d);                           //错误：PriDerv不能转换为Base
     {9.2 构造、拷贝控制与继承}
 \begin{figure}
   \centering
-  \includegraphics[width=0.8\textwidth]{Fig/Constr-Destr.png}
+  \includegraphics[width=0.7\textwidth]{Fig/Constr-Destr.png}
 \end{figure}
 
-构造顺序：\uncover<2->{B} \uncover<3->{D1} \uncover<4->{D2} \uncover<5->{D3}\uncover<6->{(c1} \uncover<7->{c2} \uncover<8->{c3)}
+\only<2->{D3 obj;}
 
-析构顺序：\uncover<9->{D3}\uncover<10->{(c3} \uncover<11->{c2} \uncover<12->{c1)} \uncover<13->{D2} \uncover<14->{D1} \uncover<15->{B}
+\uncover<2->{构造顺序：B} \uncover<3->{D1} \uncover<4->{D2} \uncover<5->{D3}\uncover<6->{(c1} \uncover<7->{c2} \uncover<8->{c3)}
+
+\uncover<9->{析构顺序：D3}\uncover<10->{(c3} \uncover<11->{c2} \uncover<12->{c1)} \uncover<13->{D2} \uncover<14->{D1} \uncover<15->{B}
 
 \end{frame}
 \subsection{派生类对象的构造}
