@@ -103,28 +103,16 @@
 
 \section{引用}
 \subsection{左值引用}
-\begin{frame}
+\begin{frame}[fragile]
 	\frametitle{4.1 引用}
-	\begin{block}{复合类型}
-		复合类型是指基于其它类型定义的类型，包括指针、引用、数组、函数、类、联合体和枚举类型等
-	\end{block}
-	\begin{abstractblock}<2->{引用}
+	\begin{abstractblock}<1->{引用}
 		\begin{itemize}
 			\item 为已创建的对象取一个\alert{别名}
 			\item 只将别名绑定到所引用的对象，对象的内容不会复制给引用
-			\item 函数间共享局部对象的重要途径，对于提高程序的效率有重要作用
+			\item 函数间共享局部对象的重要途径，对于提高程序的效率有重要作用(稍后讲解)
 		\end{itemize}
 	\end{abstractblock}
-
-	\begin{yellowblock}<3->{说明：}
-		C++11引入了右值引用，如无提示，引用默认为\alert{左值引用}
-	\end{yellowblock}
-
-\end{frame}
-
-\begin{frame}[fragile]
-	{4.1 引用}
-	\begin{block}{引用语法格式：}\vspace{-3mm}
+	\begin{block}<2->{语法格式：}\vspace{-3mm}
 		\begin{lstlisting}[basicstyle=\small\ttfamily]
 int counter = 0;
 int &refCnt = counter;      //refCnt引用counter对象的内容
@@ -135,13 +123,12 @@ refCnt = 2;                 //修改了counter所在的内存空间的内容
 int i = refCnt;             //通过引用读取counter对象的内容，并初始化对象i
         \end{lstlisting}\vspace{-3mm}
 	\end{block}
+	\begin{yellowblock}<3->{说明：}
+		C++11引入了右值引用，如无提示，引用默认为\alert{左值引用}
+	\end{yellowblock}
 
-\begin{block}<2->{定义引用时必须要初始化}\vspace{-3mm}
-		\begin{lstlisting}[basicstyle=\small\ttfamily]
-int &refCnt2;               //错误：定义引用时必须和一个对象绑定
-        \end{lstlisting}\vspace{-3mm}
-	\end{block}
 \end{frame}
+
 
 \begin{frame}[fragile]
 	{4.1 引用}
@@ -200,7 +187,7 @@ r1 = 1;                //错误：相当于修改const 对象ci 的值
 			      int i = 0;\\
 			      \onslide<3->{const int \&r1 = i;~~~~~~//正确：使用左值对象初始化}\\
 			      \onslide<4->{const int \&r2 = 1;~~~~~~//正确：使用字面值常量初始化}\\
-			      \onslide<5->{const int \&r3 = i+1;~~~~//正确：使用表达式~i+1~的结果初始化\label{chap4-1-1-const-reference}}\\
+			      \onslide<5->{const int \&r3 = i+1;~~~~//正确：使用表达式~i+1~的结果初始化}\\
 			      \onslide<6->{const int \&r4 = 3.14;~~~//正确：使用~double~类型数据初始化}
 		\end{itemize}
 	\end{block}
