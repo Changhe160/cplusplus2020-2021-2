@@ -85,7 +85,7 @@
   \item<1-> 函数---面向过程: $void ~fun()\{\}$
   \item<2-> 类---基于对象: $class ~mytype\{\};$
   \item<3-> 模板---泛型编程 : $template<typename ~T>$
-  \item<4-> 继承---面向对象 
+  \item<4-> 继承---面向对象
 \end{itemize}
 
 \end{frame}
@@ -893,8 +893,8 @@ Circle ci(1.2);
 
     \column{0.45 \textwidth}
      \begin{lstlisting}[moreemph={Shape,Square,Circle}]
-if(sq>ci)
-    p = &sq;
+if(sq>ci)    p = &sq;
+else p=&ci;
 cout<<p->area()<<endl;
     \end{lstlisting}
      \end{columns}

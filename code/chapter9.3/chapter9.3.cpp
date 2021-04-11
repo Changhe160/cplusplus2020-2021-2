@@ -96,9 +96,27 @@ public:
 		meow();
 	}
 };
-
+class Base {
+public:
+	virtual void fun(int i = 0) {
+		cout << "Base:" << i << endl;
+	}
+};
+class Derived : public Base {
+public:
+	void fun(int i = 1) {
+		cout << "Derived:" << i << endl;
+	}
+};
+void test() {
+	Derived d;
+	Base* p = &d;
+	p->fun();
+	d.fun();
+}
 
 int main() {
+	test();
 	Shape *p;
 	//cout << p->area() << endl;
 	Circle c1(1), c2(2);
