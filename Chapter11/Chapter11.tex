@@ -1,0 +1,1534 @@
+%!TEX program = xelatex
+\documentclass[UTF8,aspectratio=169,11pt,t]{ctexbeamer}
+
+\mode<presentation> {
+\usetheme{Madrid}
+\setbeamertemplate{footline}[frame number]
+\setbeamercolor{page number in head/foot}{fg=blue} %设置页码颜色
+\setbeamertemplate{navigation symbols}{}
+}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage{listings}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+
+%自定义块
+\usepackage{setspace}
+\definecolor{hanblue}{rgb}{0.27, 0.42, 0.81}
+\definecolor{indiagreen}{rgb}{0.07, 0.53, 0.03}
+\definecolor{indianred}{rgb}{0.8, 0.36, 0.36}
+\definecolor{indianyellow}{rgb}{0.89, 0.66, 0.34}
+\definecolor{babypink}{rgb}{0.96, 0.76, 0.76}
+\definecolor{ao(english)}{rgb}{0.0, 0.5, 0.0}
+% \setbeamerfont{block title}{size=\small}
+% \setbeamerfont{block body}{size=\small}
+\setbeamerfont{block title}{}
+\setbeamerfont{block body}{}
+\newenvironment<>{blueblock}[1]{
+\setbeamercolor{block title}{fg=white,bg=hanblue}
+\begin{block}#2{#1}}{\end{block}}
+\newenvironment<>{greenblock}[1]{
+\setstretch{1.3}\setbeamercolor{block title}{fg=white,bg=indiagreen}
+\begin{block}#2{#1}}{\end{block}}
+\newenvironment<>{redblock}[1]{
+\setstretch{1.3}\setbeamercolor{block title}{fg=white,bg=indianred}
+\begin{block}#2{#1}}{\end{block}}
+\newenvironment<>{yellowblock}[1]{
+\setstretch{1.3}\setbeamercolor{block title}{fg=white,bg=indianyellow}
+\begin{block}#2{#1}}{\end{block}}
+
+\lstset{language=C++,
+columns=flexible,
+basicstyle=\footnotesize\ttfamily,                                      % 设定代码字体、大小
+%numbers=left,xleftmargin=2em,framexleftmargin=2em,                   % 在左侧显示行号
+%numberstyle=\color{darkgray},                                        % 设定行号格式
+keywordstyle=\color{blue},                                            % 设定关键字格式
+commentstyle=\color{ao(english)},                                     % 设置代码注释的格式
+stringstyle=\color{brown},                                            % 设置字符串格式
+%showstringspaces=false,                                              % 控制是否显示空格
+%frame=lines,                                                         % 控制外框
+breaklines,                                                           % 控制是否折行
+postbreak=\space,                                                     % 控制折行后显示的标识字符
+breakindent=5pt,                                                      % 控制折行后缩进数量
+emph={size\_t,array,deque,list,map,queue,set,stack,vector,string,pair,tuple,function,placeholders,std,nullptr,unique\_ptr, find, cout,for_each,sort,find_if,stable_sort,bind,fill, copy, accumulate,multimap,make_pair,advance,forward_list,swap,ref}, % 非内置类型
+emphstyle={\color{teal}},
+escapeinside={(*@}{@*)},
+%调整马德里的代码行号
+% numbers=left,
+% xleftmargin=2em,
+% framexleftmargin=2em
+}
+\usepackage{tikz}
+\title[\textit{C++程序设计：第十一章}]{第十一章~标准模板库}
+
+%\author[李长河]{李长河} % Your name
+%\institute[CUG] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+%{
+%中国地质大学（武汉）\\ % Your institution for the title page
+%\medskip
+%\textit{lichanghe@cug.edu.cn} % Your email address
+%}
+\date{} % Date, can be changed to a custom date
+
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}
+	{目录}
+	\tableofcontents
+\end{frame}
+
+\begin{frame} {前言}
+	\begin{yellowblock}{学习目标}
+		\begin{itemize}
+			\item 理解迭代器的工作原理和使用方法；
+			\item 理解常见容器的特点并掌握它们的使用方法；
+			\item 了解算法的类型并掌握常用调用对象的使用方法。
+		\end{itemize}
+	\end{yellowblock}
+\end{frame}
+
+\begin{frame} {前言}
+	\begin{block}
+		{标准模板库}
+		标准模板库（standard template library，STL）是C++标准库（standard library）的重要组成部分，其包含以下几个部分：
+		\begin{description}
+			\item [容器（container）]常用的数据结构，包括vector、list等
+			\item [算法（algorithm）]操作容器的泛型算法，包括查找、排序等
+			\item [迭代器（iterator）]容器和算法之间的桥梁，处理不同类型容器的途径
+		\end{description}
+	\end{block}
+\end{frame}
+
+\section{迭代器}
+\begin{frame}{11.1~迭代器}
+	我们已经在4.6.3节介绍了\textbf{迭代器（iterator）}，并使用它访问vector类型中的元素。本节我们考虑以下问题：
+	\begin{greenblock}{问题}
+		给定一个vector或者数组以及一个数据值，要求\alert{查找给定的数据值是否在vector或者数组中}：
+		\begin{itemize}
+			\item 找到的话，返回该元素的地址
+			\item 没有找到，返回一个空指针
+		\end{itemize}
+	\end{greenblock}
+\end{frame}
+
+\subsection{实现Find函数模板}
+\begin{frame}[fragile]{11.1~迭代器\small{——实现Find函数模板}}
+	\begin{columns}[t]
+		\column{0.65\textwidth}
+		\begin{blueblock}{vector类型和数组类型的查找算法函数模板}
+			\vspace{-3mm}\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<typename T>
+const T* Find(const vector<T> &vec, const T &val) {
+    for (int i=0; i<vec.size(); ++i)
+        if (vec[i] == val) return &vec[i];
+    return nullptr;
+}
+template<typename T>
+const T* Find(const T *arr, int size,const T &val) {
+    if (!arr || size <= 0)        return nullptr;
+    for (int i = 0; i<size; ++i)
+        if (arr[i] == val) return &arr[i];
+    return nullptr;
+}
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{greenblock}
+			{观察}
+			两个函数体中循环部分代码是否一样？\\
+		\end{greenblock}
+		\pause
+		\begin{greenblock}
+			{问题}
+			那么是否可以通过同一个Find函数来处理vector和数组呢？\\
+		\end{greenblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.1~迭代器\small{——实现Find函数模板}}
+	给定线性结构\alert{第一个和尾后元素的地址}，通过指针访问之，就可以实现一个通用算法如下：
+	\begin{blueblock}{通用算法}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<typename T>
+const T* Find(const T *first, const T *last, const T &val) {
+    if (!first || !last )
+        return nullptr;
+    for (; first!=last; ++first)//last为尾后元素的地址
+        if (*first == val)
+            return first;
+    return nullptr;
+}
+        \end{lstlisting}
+	\end{blueblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.1~迭代器\small{——实现Find函数模板}}
+	测试代码如下：
+	\begin{blueblock}{通用算法}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+if (auto p = Find(arr, arr + sizeof(arr) / sizeof(int), 5))
+    cout << *p << endl; //处理数组
+if (auto p = Find(&vi[0], &vi[vi.size() - 1]+1, 4))
+    cout << *p << endl; //处理vector
+        \end{lstlisting}
+	\end{blueblock}
+	\begin{greenblock}{思考}
+		以上代码需要用户自行指定第一个和尾后元素的地址，比较麻烦。\\
+		我们是否可以简化这个过程？
+	\end{greenblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.1~迭代器\small{——实现Find函数模板}}
+	将vector的第一个元素和尾后元素取地址的操作包装为如下的\textbf{Begin和End函数模板}：
+	\begin{blueblock}{Begin和End函数模板（vector）}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<typename T>
+const T* Begin(const vector<T> &vec) {
+    return vec.size() > 0 ? &vec[0] : nullptr;
+}
+template<typename T>
+const T* End(const vector<T> &vec) {
+    return vec.size() > 0 ? &vec[vec.size()-1]+1 : nullptr;
+}
+        \end{lstlisting}
+	\end{blueblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.1~迭代器\small{——实现Find函数模板}}
+	对数组首元素和尾后元素的封装类似：
+	\begin{blueblock}{Begin和End函数模板（数组）}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<typename T, size_t N>
+const T* Begin(const T (&arr)[N]) {
+    return arr;
+}
+template<typename T, size_t N>
+const T* End(const T (&arr)[N]) {
+    return arr + N;
+}
+        \end{lstlisting}
+    \end{blueblock}
+    其中，模板函数形参arr是实参数组的引用。
+\end{frame}
+
+\begin{frame}[fragile]{11.1~迭代器\small{——实现Find函数模板}}
+	使用封装后的Begin和End调用Find函数的示例如下：
+	\begin{blueblock}{传入Begin和End调用Find函数}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+Find(Begin(vi), End(vi), 4);
+Find(Begin(arr), End(arr), 4);
+        \end{lstlisting}
+	\end{blueblock}
+	\pause
+	和原始调用方式比较：
+	\begin{blueblock}{原始调用方式}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+Find(&vi[0], &vi[vi.size() - 1]+1, 4) //处理vector
+Find(arr, arr + sizeof(arr) / sizeof(int), 4) //处理数组
+    \end{lstlisting}
+	\end{blueblock}
+	可见简洁很多。
+\end{frame}
+
+\subsection{使用迭代器}
+\begin{frame}[fragile]{11.1~迭代器\small{——使用迭代器}}
+	每一种容器都有一个与之关联的迭代器。可以通过成员函数begin和end获取第一个元素和尾后元素的迭代器，如:
+	\begin{blueblock}{使用迭代器}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+vector<int> vi = {0,1,2,3};
+vector<int>::iterator itb = vi.begin(); //itb指向vi 的首元素
+vector<int>::iterator ite = vi.end(); //ite指向vi的尾后元素
+        \end{lstlisting}
+	\end{blueblock}
+	定义一个迭代器对象时，我们必须要指明与之关联的容器和元素类型。如上述代码中迭代器指向\texttt{vector<int>}中的元素。\\
+	\pause
+	通常我们会用auto来简化迭代器定义
+	\begin{blueblock}{利用auto简化迭代器定义}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+auto itb = vi.begin(); //利用auto简化定义
+        \end{lstlisting}
+	\end{blueblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.1~迭代器\small{——使用迭代器}}
+	无论指向何种容器，迭代器都支持以下操作：
+	\begin{itemize}
+		\item \textbf{解引用与成员选择}：*iter, iter->member（等价于(*iter).member）；
+		\item \textbf{自增运算符}：++iter, iter++；
+		\item \textbf{赋值运算符}：iter1 = iter2；
+		\item \textbf{关系 == 和 != 运算}：iter1 == iter2, iter1 != iter2。\\
+	\end{itemize}
+	\pause
+	\vspace{0.5cm}
+	通常，我们使用迭代器来遍历容器中的元素
+	\begin{blueblock}
+		{使用迭代器进行遍历}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+for(auto it = vi.begin(); it != vi.end(); ++it){ //遍历vector
+    cout << *it <<endl;
+}
+            \end{lstlisting}
+	\end{blueblock}
+	几乎STL提供的所有算法都是通过迭代器实现对容器中元素的操作，即通过接受由begin和end划定的\alert{左闭合区间[begin,end)}，对区间内元素进行操作。
+\end{frame}
+
+\begin{frame}[fragile]{11.1~迭代器\small{——使用迭代器*}}
+	迭代器的简单分类如下：
+	\begin{itemize}
+		\item \textbf{输入（input）迭代器}：只能单步向前迭代（自增运算++），\alert{不允许修改由该类迭代器引用的元素}；
+		\item \textbf{输出（output）迭代器}：该类迭代器和输入迭代器相似，也只能单步向前迭代，不同的是该类迭代器对引用的元素\alert{只能执行写操作}；
+		\item \textbf{前向（forward）迭代器}：该类迭代器可以在一个正确的区间中进行读写操作，它拥有输入和输出迭代器的特性，\alert{仅支持自增运算}；
+		\item \textbf{双向（bidirectional）迭代器}：该类迭代器是在前向迭代器基础上提供了单步向后迭代的功能，\alert{支持自增（++）和自减（- -）运算}；
+		\item \textbf{随机访问（random access）迭代器}：该类迭代器具有上面所有迭代器的功能，并能\alert{直接访问容器中任意一个元素}，支持iter+n, iter-n, iter+=n, iter-=n,iter1-iter2。
+	\end{itemize}
+	\begin{redblock}{注意}
+		一个迭代器的类型取决于\alert{与其关联的容器类型}，比如一个指向vector类型的迭代器的类型为随机访问迭代器。
+	\end{redblock}
+\end{frame}
+
+\section{容器}
+\subsection{容器概述}
+\begin{frame}{11.2~容器\small{——容器概述}}
+	\begin{block}
+		{容器}
+		容器是\alert{特定类型对象的集合}，集合中的元素通过某种数据结构组织在一起
+	\end{block}
+	STL中的容器主要由两大类组成：
+	\begin{itemize}
+		\item 顺序容器
+		\item 关联容器
+	\end{itemize}
+	\vspace{0.5cm}
+\pause
+	\par
+	大多数容器都支持以下操作：
+	\begin{itemize}
+		\item 关系运算
+		\item 赋值运算成员
+		\item begin和end成员
+		\item empty成员
+		\item size成员
+		\item clear成员
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——容器概述*}}
+	一般而言，每个容器都定义在一个与容器名相同名称的头文件中，使用时包含之即可
+	\begin{blueblock}{包含容器头文件}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+#include <vector>
+                \end{lstlisting}
+	\end{blueblock}
+	每一种容器均被定义为类模板，因此在使用时需要提供额外的模板参数信息
+	\begin{blueblock}{提供容器模板参数}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+vector<string> vs;
+            \end{lstlisting}
+	\end{blueblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——容器概述*}}
+	C++11 还为每一种容器提供了\textbf{cbegin和cend成员}，分别返回第一个元素和尾后元素的
+	const迭代器，\alert{不允许对指向的元素执行写操作}
+	\begin{blueblock}{cbegin和cend}
+		\begin{lstlisting}[basicstyle=\small\ttfamily]
+vector<int> vec = {0, 1, 2, 3, 4};
+auto it1 = vec.begin();         //返回第一个元素的迭代器
+auto it2 = vec.cbegin();        //返回第一个元素的const迭代器
+*it1 = 4;                       //正确：修改第一个元素的值
+*it2 = 5;                       //错误：it2为const 迭代器，不允许修改指向的对象
+                \end{lstlisting}
+	\end{blueblock}
+	\begin{yellowblock}
+		{说明}
+		对于begin成员，只有当容器是const类型，才返回const类型迭代器；否则返回非const。为了避免不必要的修改错误，C++增加了上述cbegin和cend成员。
+	\end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——容器概述*}}
+	以下代码展示vector的插入和删除数据操作：
+	\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}{vector的插入和删除数据操作}
+			\begin{lstlisting}[basicstyle=\small\ttfamily]
+vector<int> vec = {0, 1, 2, 3, 4};
+vec.insert(vec.begin(),10);     //在首部插入10
+vec.erase(vec.begin()+1);       //删除vec中第二个元素
+                    \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{redblock}{注意}
+			除C++11新增的array 容器以外，其它容器都是可变长的
+		\end{redblock}
+	\end{columns}
+\end{frame}
+
+%!这里有问题！
+\begin{frame}[fragile]{11.2~容器\small{——容器概述}}
+	C++11为可变长容器新增的\textbf{emplace成员}，示例如下：
+	\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}{定义一个foo类}
+			\begin{lstlisting}[moreemph={T}]
+struct Foo{
+    Foo(const string &name, int id) :m_name(name), m_id(id) {}
+    string m_name;
+    int m_id;
+};
+                    \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——容器概述}}
+	C++11为可变长容器新增的\textbf{emplace成员}，示例如下：
+	\begin{blueblock}{emplace与insert成员用法区别}
+		\begin{lstlisting}[moreemph={T}]
+vector<Foo> vf;
+vf.push_back(Foo("Lisha", 12));                 //将临时对象移到容器的末尾
+vf.insert(vf.begin(),Foo("Mandy", 13));         //将临时对象移到容器的开始位置
+vf.emplace_back("Kevin", 11);                   //在容器的末尾新增一个元素
+vf.emplace(vf.begin(),"Rosieta", 10);           //在容器的首部插入一个元素
+                \end{lstlisting}
+	\end{blueblock}
+\pause
+	\begin{yellowblock}{说明}
+		$\bullet$ emplace成员通过一个\alert{参数包}接受的参数来\alert{构造一个元素}并将之插入容器中。\\
+		$\bullet$ emplace\_back函数调用把两个实参传递给Foo类的构造函数，并在vf的末尾\alert{利用这两个参数值构造一个新元素}\\
+		$\bullet$ 与emplace\_back成员相比，push\_back和insert成员只能移动或复制\alert{已构造元素}\\
+	\end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——容器概述*}}
+		\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}{swap操作交换两个相同类型容器的数据}
+			\begin{lstlisting}[moreemph={T}]
+vector<int> v1 = {0, 1};            //2个元素的vector
+vector<int> v2 = {0, 1, 2, 3};      //4个元素的vector
+swap(v1, v2);
+                    \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ 调用swap 函数之后，v1将包含4个元素，v2将包含2个元素。\\
+		\end{yellowblock}
+	\end{columns}
+	\begin{redblock}{注意}
+		$\bullet$ 除array之外，swap函数不会执行任何数据复制、插入或删除操作。\\
+		$\bullet$ 对于array来说，swap会真正交换相同位置的元素。
+	\end{redblock}
+	\begin{greenblock}{思考}
+		对于array和其他容器而言，swap操作之后与容器绑定的迭代器、指针以及所指向的元素是否发生了变化？各发生了怎样的变化？
+	\end{greenblock}
+\end{frame}
+
+\subsection{顺序容器}
+\begin{frame}[fragile]{11.2~容器\small{——顺序容器}}
+	\begin{block}{顺序容器}
+		顺序容器都是线性结构，提供了元素的快速顺序访问能力。
+	\end{block}
+	\begin{yellowblock}{注意}
+		但对于非线性访问和元素增减操作，它们有很大的性能差别。
+		\begin{itemize}
+			\item 与vector、string、deque、array等容器绑定的迭代器支持随机访问
+			\item 与list绑定的迭代器支持双向单步迭代
+			\item 与forward\_list绑定的迭代器只支持前向单步迭代。
+		\end{itemize}
+	\end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——顺序容器}}
+	定长数组容器array的使用如下：
+	\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用array}
+			\begin{lstlisting}[moreemph={T}]
+array<int, 4> arr = {1,2,3,4};
+for (auto it = arr.begin(); it != arr.end(); ++it)
+cout << *it << endl;
+array<int, 4> arr2 = arr;       //array对象允许复制
+arr2.fill(0);                   //所有元素赋值为0
+                    \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ 相比于普通数组，array更安全、易使用\\
+			$\bullet$ array不支持插入、删除等改变容器大小的操作\\
+			$\bullet$ 但array对象支持赋值和复制操作，还能通过size成员获取数组的大小\\
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——顺序容器}}
+	双端队列容器deque的使用如下：
+	\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用deque}
+			\begin{lstlisting}[moreemph={T}]
+deque<int> dq = {1,2,3};
+dq.push_back(4);            //尾部插入一个元素
+dq.push_front(0);           //首部插入一个元素
+cout << dq[3]<< endl;       //随机访问
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ 与vector类似，deque支持随机访问\\
+			$\bullet$ 与vector不同的是，deque可以在\alert{首尾两端}进行快速地插入和删除操作\\
+		\end{yellowblock}
+	\end{columns}
+	\begin{redblock}{注意}
+		deque的随机访问效率比容器要低很多。\\
+		因其由一些在内存中\alert{互相独立}的动态数组组成\\
+	\end{redblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——顺序容器*}}
+	forward\_list的使用如下：
+	\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用forward\_list}
+			\begin{lstlisting}[moreemph={T}]
+forward_list<int> flst = { 2, 3 };
+flst.push_front(1);                         //在flst首部插入数据
+flst.insert_after(flst.before_begin(), 0); //同上
+for (auto it = flst.begin(); it != flst.end(); ++it)
+    cout << *it << " ";                     //打印输出：0 1 2 3
+            \end{lstlisting}
+		\end{blueblock}
+		使用distance函数获取forward\_list中的元素数目：
+		\begin{blueblock}{使用distance获取forward\_list元素数目}
+			\begin{lstlisting}[moreemph={T}]
+cout << "size: " <<
+  distance(flst.begin(), flst.end()) << endl;
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\only<1>{\begin{yellowblock}{说明}
+				$\bullet$ forward\_list仅提供给定位置\alert{后}的插入删除操作\\
+				$\bullet$ \alert{before\_begin成员}返回的迭代器是不能解引用的\\
+				$\bullet$ 出于性能考虑，forward\_list\alert{放弃了size函数}\\
+			\end{yellowblock}}
+		\only<2->{\begin{redblock}{注意}
+				与vector、array、deque相比，forward\_list\alert{不支持随机访问}。但对于元素的\alert{插入、删除、移动}等操作，它的性能要好于前三者\\
+			\end{redblock}}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——顺序容器}}
+	\begin{blueblock}{使用list}
+		\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+list<int> lst1 = {2,3}, lst2 = {1};
+lst1.push_back(5);                                  //在lst1的尾部插入元素5
+lst2.push_front(0);                                 //在lst2的首部插入元素0
+auto pos = find(lst1.begin(),lst1.end(),5);         //找到指向元素5的迭代器
+lst1.insert(pos, 4);                                //在此位置插入元素4
+lst1.splice(lst1.begin(), lst2);                    //将lst2插入到lst1中第1个元素位置
+for (auto it = lst1.begin(); it != lst1.end(); ++it)
+    cout << *it << " ";                             //打印输出：0 1 2 3 4 5
+            \end{lstlisting}\vspace{-2.5mm}
+	\end{blueblock}
+	\begin{yellowblock}{说明}
+		$\bullet$ list是一个\alert{双向链表}\\
+		$\bullet$ 除了insert、push\_back等成员可以执行插入操作外，可以使用splice成员将\alert{一个list中的元素转移到另外一个list中}\\
+		$\bullet$ splice函数调用执行完后，lst2变为空列表\\
+	\end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——顺序容器}}
+	list的使用如下：
+	\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用splice移动某一范围元素}
+			\begin{lstlisting}[moreemph={T}]
+list<int> lst3 = { 6,7,8 };
+auto it = lst3.begin();
+//将it后移两个位置
+advance(it , 2);
+//将lst3中前两个元素转移到lst1的尾部
+lst1.splice(lst1.end(), lst3, lst3.begin(),it);
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ splice
+			调用将lst3 中从begin到it范围内的元素转移到lst1的尾部\\
+			$\bullet$ 上面splice调用结束时，lst1的尾部新增两个元素，lst3剩余1个元素。\\
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——顺序容器}}
+	没有性能完美的容器，在选择顺序容器时，我们需要考虑以下几点：
+	\vspace{0.3cm}
+	\begin{itemize}[<+->]
+		\item 如果需要高效的随机存取，不在乎插入和删除的效率，则使用vector；
+		\item 如果需要大量的插入和删除元素，不关心随机存取的效率，则使用list；
+		\item 如果需要随机存取，并且关心两端数据的插入和删除效率，则使用deque；
+		\item 如果仅在读取输入的数据时在容器的中间位置插入元素，数据输入完毕之后仅需要随机访问，则可考虑在输入时将元素读入到一个list 容器中，然后对此容器使用sort函数排序，最后将排序后的list复制到一个vector容器中。
+		\item 如果程序既需要随机访问又必须在容器的中间位置插入或删除元素，那么我们需要比较随机访问list 和在vector 中间插入或删除元素时移动元素的代价。
+	\end{itemize}
+	\begin{redblock}<6->
+		{注意}
+		如果无法确定某种应用应该采用哪种容器，则编写代码时尝试\alert{只使用vector和list容器都提供的操作}，方便以后进行转换。
+	\end{redblock}
+\end{frame}
+
+\subsection{关联容器}
+\begin{frame}[fragile]{11.2~容器\small{——关联容器}}
+	\begin{block}{关联容器}
+		不同于顺序容器，关联容器采用\alert{非线性}结构。通常情况下，关联容器是通过\alert{树结构}实现的，并通过\alert{关键字}来访问其元素。STL中主要的两个关联容器是：
+		\begin{itemize}
+			\item \textbf{set}
+			\item \textbf{map}
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——关联容器}}
+	\begin{block}
+		{set}
+		\alert{每个元素只包含一个关键字}，与数学上的集合类似，set\alert{不包含重复的元素}，且都是\alert{有序}的
+	\end{block}
+	\begin{greenblock}
+		{例11.1}
+		统计输入的一组数字中不同数字的个数，并将它们排序输出
+	\end{greenblock}
+\vspace{-3mm}
+	\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}<2->{例11.1}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+set<int> counter; //创建一个关键字类型为int的空set对象
+int number;
+while (cin>>number)             //输入数字
+    counter.insert(number);     //将输入的数字插入到set中
+cout << "不同的数字的个数：" << counter.size() << endl;//获取元素个数
+for (auto &i : counter)         //遍历每个元素
+    cout << i << " ";           //输出每个元素
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}<2->{说明}
+\scriptsize{
+			$\bullet$ 向set插入元素时，如果已有，则将其抛弃；否则，按序将其插入。\\
+			$\bullet$ 输入：1 8 4 2 0 1 4 3 5 4，\\输出：不同数字的个数：7 \\       0 1 2 3 4 5 8\\
+			$\bullet$ 可见重复元素被排除，剩余按升序排列
+}
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——关联容器}}
+		\begin{columns}
+		\column{0.65\textwidth}
+		\begin{blueblock}{find查找set中元素}
+			\begin{lstlisting}[moreemph={T}]
+vector<int> v = { 1, 8, 4, 2, 0, 1, 4, 3, 5, 4, 7 };
+set<int> s(v.begin(), v.end());     //利用vector创建set
+auto it = s.find(0);                //查找关键字为0的元素
+            \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{erase删除set中元素}
+			\begin{lstlisting}[moreemph={T}]
+s.erase(it);                        //删除关键字为0的元素
+s.erase(s.find(3), s.find(7));      //删除范围[3,7)内元素
+for (auto &i : s)
+    cout << i << " ";               //打印输出：1 2 7 8
+        \end{lstlisting}    
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ 待查元素存在，则返回该元素的迭代器；否则返回尾后迭代器\\
+			$\bullet$ erase成员的迭代器范围为左闭合区间\\
+		\end{yellowblock}
+		\begin{redblock}
+			{注意}
+			调用erase成员不影响与set中其它元素绑定的迭代器或引用。
+		\end{redblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——关联容器}}
+	介绍map之前，首先了解一种标准库类型模板\textbf{pair}：
+	\begin{block}{pair}
+		pair定义在头文件utility中，包含两部分数据成员\\
+	\end{block}
+	\begin{blueblock}{使用pair}
+		\begin{lstlisting}[moreemph={T}]
+pair<int, int> p1;                              //保存两个int类型数据
+pair<string, int> p2 = {"Hello", 0};            //列表初始化两个成员
+auto p3 = make_pair("Hello", 1);                //make_pair函数返回一个pair对象
+cout << p2.first << p2.second << endl;          //访问pair中数据成员
+    \end{lstlisting}
+	\end{blueblock}
+	\begin{yellowblock}{说明}
+		pair的两个数据成员是\alert{公有的}，名字分别为first和second\\
+	\end{yellowblock}
+\end{frame}
+
+
+\begin{frame}[fragile]{11.2~容器\small{——关联容器}}
+\vspace{-6mm}
+	\begin{columns}[T]
+		\column{0.6\textwidth}
+		\begin{greenblock}{例11.2}
+			统计输入的一组数字中\alert{每个数字出现的次数}
+		\end{greenblock}
+		\begin{blueblock}{使用map}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+map<int, int> counter; //创建map对象
+int number;
+while (cin >> number)
+    ++counter[number];
+for (auto &i : counter) //遍历map 中每个元素
+    cout << i.first << ": " << i.second << endl;
+输入：1 2 4 4 5 3 2 4 7 0 2
+输出：
+0：1
+1: 1
+2: 3
+...
+        \end{lstlisting}
+		\end{blueblock}
+		\column{0.35\textwidth}
+		\begin{block}{map}
+			map与set类似，都是有序容器。但map中的元素是pair类型，第一个成员为用于索引的\alert{关键字}，第二个成员为与关键字相关的\alert{值}。
+		\end{block}
+		\only<1>{\begin{yellowblock}{说明}
+				$\bullet$ 下标运算用来获取与关键字关联的值\\
+				$\bullet$ 如找到关键字对应元素则其值自增，否则以此关键字生成新的元素\\
+			\end{yellowblock}}
+		\only<2->{\begin{redblock}{注意}
+				由于下标运算可能会插入新元素。因此，它只能作用于\alert{非const的map对象}\\
+			\end{redblock}}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——关联容器}}
+	使用map：
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用insert成员添加元素}
+			\begin{lstlisting}[moreemph={T}]
+counter.insert({ 3, 0 }); //C++11新特性
+counter.insert(make_pair(3, 0));
+        \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{检测插入是否成功}
+			\begin{lstlisting}[moreemph={T}]
+auto res=counter.insert(pair<int, int>(2,0));//自动推导res的类型
+if (!res.second)                //关键字2已经存在
+    ++res.first->second;        //关键字为2的元素的值自增
+        \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ insert函数返回一个pair对象，该对象的第一个成员为一个指向map中给定关键字的迭代器，第二个成员是一个bool值。给定关键字已存在则其值为false；否则为true
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——关联容器}}
+	提示：C++11新标准允许为关联容器进行列表初始化
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{关联容器列表初始化}
+			\begin{lstlisting}[moreemph={T}]
+set<string> names = {"Kevin", "Lisha", "Mandy", "Rosieta"};
+map<string, unsigned long long> contact = {
+{"Kevin",15387120503}, {"Rosieta",15387120506}};
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ 对于set，每个元素的类型即为关键字类型。对于map，每个元素的类型为一对花括号括起来的pair类型
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——关联容器*}}
+	\vspace{-3mm}
+	\begin{greenblock}{multimap的使用范例}
+		set和map中的关键字必须是唯一的。但有些情况下，比如我们存放电话簿时，同一个人可能有不同的手机号码，这时候应该怎么办？
+	\end{greenblock}
+\vspace{-3mm}
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用multimap}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+multimap<string, unsigned long long> contact;
+contact.insert({ "Kevin",15387120503 });
+contact.insert({ "Kevin",15387120506 });
+for (auto &i : contact)
+    cout << i.first << ": " << i.second << endl;
+auto entries = contact.count("Kevin");
+auto it = contact.find("Kevin");
+while (entries) {
+    cout << it->second << endl;         //打印电话号码
+    ++it;                               //移动到下一个记录
+    --entries;                          //计数器自减
+}
+            \end{lstlisting}
+            \vspace{-3mm}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ find语句将返回第一个关键字为Kevin的元素的迭代器\\
+			$\bullet$ 利用count返回的值，不断递增it，直到Kevin的所有号码被打印\\
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\subsection{高效使用容器}
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器}}
+	我们在编程中常常会面临容器的选择，而不合理的容器选择将会大大\alert{降低程序的效率}。本节将介绍一些常用的容器使用原则：
+	\begin{itemize}
+		\item 使用empty检查容器是否为空
+		\item \alert{使用存放指针的容器}
+		\item 使用算法和区间成员
+		\item 使用reserve成员
+		\item 使用有序的vector容器
+		\item 正确使用map的insert和下标运算符
+		\item 使用成员函数代替同名的算法
+	\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器*}}
+\vspace{-3mm}
+	\begin{yellowblock}{1.使用empty检查容器是否为空}
+		empty和size成员均能用于检测容器是否为空，但是empty存在两个优势：
+		\begin{itemize}
+			\item empty总能保证\alert{常数时间内返回}
+			\item empty是所有容器\alert{通用}的操作
+		\end{itemize}
+		而成员size不总是通用的，比如forforward\_list就没有提供size成员。\\
+		因此建议使用成员empty来检查容器是否为空。
+	\end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器}}
+\vspace{-3mm}
+	\begin{yellowblock}{2.使用存放指针的容器}
+		如果容器中存放的对象是\alert{大对象}（占用较大内存空间），那么在操作容器过程中\alert{复制大对象}会使得程序付出很大的性能代价。此时我们可以考虑使用\alert{指针的容器}而不是对象的容器。
+	\end{yellowblock}
+	比如我们有以下“大”对象类
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器}}
+\vspace{-6mm}
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{定义“大”对象类}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={LargeData}]
+struct LargeData {
+    LargeData(int id): m_id(id){}
+    int m_id;
+    int m_arr[1000];
+};
+            \end{lstlisting}\vspace{-3mm}
+		\end{blueblock}
+		\begin{blueblock}{reverse“大”对象}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={LargeData}]
+vector<LargeData*> vp;
+vector<LargeData> vo;
+for (int i = 0; i < 50000; i++){
+    int n = rand() % 1000000; //生成一个随机数
+    vp.emplace_back(new LargeData(n)); //尾插一个元素
+    vo.emplace_back(n); //尾插一个元素
+}
+reverse(vo.begin(), vo.end()); //翻转对象
+reverse(vp.begin(), vp.end()); //翻转指针
+            \end{lstlisting}\vspace{-3mm}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ 对vo的reverse操作会对对象进行复制，但对vp的reverse操作只涉及到指针的复制\\
+			$\bullet$ 因此，对vp执行reverse操作会比对vo执行reverse操作花费的时间少很多。
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器}}
+	同时，为了方便地维护内存，\alert{避免内存泄漏问题}，我们可以在容器中存放unique\_ptr
+	% \begin{columns}[T]
+	%     \column{0.65\textwidth}
+	\begin{blueblock}{在容器中存放unique\_ptr}
+		\begin{lstlisting}[moreemph={LargeData}]
+vector<unique_ptr<LargeData>> vsp;              //定义一个存放unique_ptr的vector
+vsp.push_back(make_unique<LargeData>(1));        //make_unique为C++14标准
+vsp.push_back(std::move(unique_ptr<LargeData>(new LargeData(2))));
+vsp.emplace_back(new LargeData(3));
+            \end{lstlisting}
+	\end{blueblock}
+	% \column{0.3\textwidth}
+	\begin{yellowblock}{说明}
+		$\bullet$ 第三条语句使用move函数将一个临时对象移动到vsp的尾部\\
+		$\bullet$ 第四条语句使用emplace函数在vsp的尾部直接构造一个对象。\\
+	\end{yellowblock}
+	% \end{columns}
+	\pause
+	\begin{redblock}{注意}
+		对指针容器使用排序算法时，我们需要定义\alert{基于对象的比较函数}
+	\end{redblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器*}}
+	\begin{yellowblock}{3.使用算法和区间成员}
+		相比单元素遍历操作，使用区间成员的优势在于:1）\alert{更少的函数调用}；2）\alert{更少的元素移动}；3）\alert{更少的内存分配}
+	\end{yellowblock}
+\vspace{-3mm}
+	\begin{columns}[T]
+		\column{0.6\textwidth}
+		\begin{blueblock}{插入元素：使用单元素遍历操作}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+int arr[] = { 1,2,4,10,5,4,1,8,20,30,15 };
+vector<int> vi;
+for (int i = 0; i < 7; i++)
+    vi.push_back(arr[i]);
+                \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{插入元素：使用区间成员}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+vi.assign(arr, arr + 7);
+                \end{lstlisting}
+		\end{blueblock}
+		\column{0.35\textwidth}
+		\only<1>{\begin{yellowblock}{说明}
+				每次vi\alert{容量}小于需求时，vector先\alert{分配更大空间}，然后\alert{移动}已有元素，最后\alert{添加}新元素\\
+			\end{yellowblock}
+			\begin{yellowblock}{}
+				此处代码首先得到简化，并且减少了内存分配和数据移动的操作，提高了性能\\
+			\end{yellowblock}}
+		\only<2->{\begin{redblock}{注意}
+				对于vector容器，成员\alert{capacity}指的是当前状态下，容器\alert{能容纳的}元素数目，而\alert{size}指的是当前容器中\alert{实际的}元素数目。
+			\end{redblock}}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器*}}
+\vspace{-3mm}
+	\begin{yellowblock}{4.使用reserve成员}
+		对于vector 容器，如果\alert{预先知道数据需要的空间大小}，可以利用\textbf{reserve成员}\alert{预先分配空间}，这样会避免重新分配空间和移动已有元素产生的代价。
+	\end{yellowblock}
+\vspace{-3mm}
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{插入元素：使用单元素遍历操作}
+			\begin{lstlisting}[moreemph={T}]
+vector<int> vi;
+cout << "预留前，容量："<<vi.capacity()<<"大小："
+  <<vi.size()<<endl;
+vi.reserve(1000);
+cout << "预留后，容量："<<vi.capacity()<<"大小："
+  <<vi.size()<<endl;
+                    \end{lstlisting}\vspace{-3mm}
+		\end{blueblock}
+		\begin{blueblock}{运行结果}
+			输出：预留前，容量：0，大小：0\\
+			输出：预留后，容量：1000，大小：0
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{redblock}{注意}
+			使用reserve只是重新分配内存空间，改变它的容量，但不会对vector产生resize行为，因此容器中的\alert{内容是不变的}
+		\end{redblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器*}}
+\vspace{-3mm}
+	\begin{yellowblock}{5.使用有序的vector容器}
+		如果我们的操作是分阶段的，如一系列插入操作->查询操作，那么我们可以:
+		\begin{enumerate}
+			\item 使用\alert{有序关联容器}完成插入
+			\item 使用关联容器创建\alert{有序vector}
+			\item 使用vector进行查询
+		\end{enumerate}
+	\end{yellowblock}
+\vspace{-3mm}
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用有序的vector容器}\vspace{-3mm}
+			\begin{lstlisting}[moreemph={T}]
+multiset<int> s; //利用multset存放有序元素
+int number;
+while (cin >> number)  s.insert(number);
+vector<int> v(s.begin(), s.end()); //创建有序vector
+if (binary_search(v.begin(), v.end(), 10)) //二分查找
+    cout << "10 is found" << endl;
+else cout << "10 is not found" << endl;
+            \end{lstlisting}\vspace{-3mm}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{blueblock}{运行结果}
+			输入：10 20 10 30 15 20 10\\
+			输出：10 is found
+		\end{blueblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器*}}
+\vspace{-3mm}
+	\begin{yellowblock}{6.正确使用map的insert和下标运算符}
+		对于map来说，其成员insert和下标运算符有着不同的功能:
+		\begin{itemize}
+			\item 使用下标运算符意味着可能插入新的元素或覆盖已有元素的值
+			\item insert专用于插入，不会覆盖已有元素
+			\item at成员则只对元素进行访问
+		\end{itemize}
+	\end{yellowblock}
+	如果不在意下标运算符是否会插入新的元素，则可尽情使用。比如：
+\vspace{-3mm}
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{前例11.2~统计数字出现的次数}\vspace{-3mm}
+			\begin{lstlisting}[moreemph={T}]
+map<int, int> counter;
+int number;
+while (cin >> number)
+    ++counter[number];
+for (auto &i : counter)
+    cout << i.first << ": " << i.second << endl;
+            \end{lstlisting}\vspace{-3mm}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{blueblock}{运行结果}
+			输入：
+			1 2 4 4 5 3 2 4 7 0 2\\
+			输出：\\
+			0: 1\\
+			1: 1\\
+			2: 3\\
+			...
+		\end{blueblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.2~容器\small{——高效使用容器*}}
+\vspace{-3mm}
+	\begin{yellowblock}{7.使用成员函数代替同名的算法}
+		有些容器的成员函数名和STL中算法的名字相同，它们都实现某种特定的功能。通常情况下，\alert{成员函数的效率要好于全局算法}。
+	\end{yellowblock}
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{查找——全局函数和成员函数}
+			\begin{lstlisting}[moreemph={T}]
+vector<int> v = { 3, 7, 3, 11, 3, 3, 2 };
+set<int> s(v.begin(), v.end());
+auto it1 = find(s.begin(), s.end(), 10); //查找速度慢
+auto it2 = s.find(10); //查找速度快
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}{说明}
+			$\bullet$ 全局find函数查找时为\alert{依次比较}，为线性复杂度\\
+			$\bullet$ set成员find会\alert{利用set的有序性快速查找}，为对数复杂度
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\section{泛型算法}
+\begin{frame}[fragile]{11.3~泛型算法}
+	标准库提供了可以用于不同容器的泛型算法。它们有一致的结构，大多数算法都接受一个范围迭代器，对此范围内的元素进行处理。算法并不需要了解所处理容器的类型。\\
+	本节我们将介绍算法的框架和使用方法，算法详细介绍可参考在线手册：http://zh.cppreference.com/。
+\end{frame}
+
+\subsection{算法概述}
+\begin{frame}[fragile]{11.3~泛型算法\small{——算法概述}}
+	\begin{block}{标准库算法}
+		依据算法对元素的访问方式，标准库算法主要有三大类：
+		\begin{itemize}
+			\item 只读型
+			\item 写入型
+			\item 重排型
+		\end{itemize}
+		大多数算法都定义在头文件algorithm中，基本语法格式见书中附录C。
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——算法概述}}
+	\begin{block}{只读型算法}
+		只是读取迭代器范围内的元素，不会改变元素的内容
+	\end{block}
+\vspace{-4mm}
+	\begin{columns}[T]
+		\column{0.67\textwidth}
+		\begin{blueblock}{只读算法案例1——find}
+			\begin{lstlisting}[moreemph={T}]
+vector<int> v = { 3, 7, 3, 11, 3, 3, 2 };
+auto it = find(v.begin(), v.end(), 10);
+cout << "10 is "<<(it != v.end() ? "found" : "not found");
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{block}{find函数}
+			遍历给定范围内的元素是否存在一个特定值
+		\end{block}
+	\end{columns}
+
+\begin{yellowblock}{说明}
+
+  $\bullet$ 前两个参数为迭代器范围，第三个参数为待搜索值\\
+	$\bullet$ 它从开始位置\alert{依次}将每个元素与给定值比较\\
+	$\bullet$ 如找到，返回\alert{第一个}与给定值相等的元素的迭代器\\
+	$\bullet$ 否则返回\alert{第二个参数}表示搜索失败
+
+	
+\end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——算法概述}}
+	\begin{columns}[T]
+		\column{0.6\textwidth}
+		\begin{blueblock}{只读算法案例2——accumulate}
+			\begin{lstlisting}[moreemph={T}]
+int sum = accumulate(v.begin(), v.end(), 0);
+            \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{只读算法案例2——accumulate}
+			\begin{lstlisting}[moreemph={T}]
+vector<string> vs = { "Hello ","world" };
+string s1 = accumulate(vs.begin(), vs.end(), string()); //正确
+string s2 = accumulate(vs.begin(), vs.end(), ""); //错误
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.35\textwidth}
+		\begin{block}{accumulate函数}
+			计算特定范围内元素的和
+		\end{block}
+		\only<1>{\begin{yellowblock}{说明}
+				$\bullet$ 第三个参数表示和的初始值\\
+				$\bullet$ 初始值决定返回值类型\\
+				$\bullet$ 下方第三条语句中的第三个参数类型为const char*。由于\alert{const char*没有定义+运算}，因此产生编译错误\\
+			\end{yellowblock}}
+		\only<2->{\begin{redblock}{注意}
+				$\bullet$ 如果元素的类型为string，那么将把范围内所有的string连接起来。\\
+				$\bullet$ 其中第三个参数类型必须是string类型，不能是字符串常量
+			\end{redblock}}
+	\end{columns}
+\end{frame}
+
+%!此处估计要有图
+\begin{frame}[fragile]{11.3~泛型算法\small{——算法概述}}
+\vspace{-3mm}
+	\begin{block}{写入型算法}
+		将元素的值写入到容器中
+	\end{block}
+\vspace{-3mm}
+	\begin{columns}[T]
+		\column{0.6\textwidth}
+		\begin{blueblock}{写入型算法案例——fill}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+vector<int> v1(10),v2(15);
+fill(v1.begin(), v1.end(), 1); //将容器v1中所有元素重置为1
+copy(v1.begin(), v1.end(), v2.begin()); //将v1中的元素复制到v2中
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.35\textwidth}
+		\begin{block}
+			{fill函数}
+			将\alert{给定值}写入到\alert{指定范围}
+		\end{block}
+		\begin{block}
+			{copy函数}
+			将\alert{给定范围内元素}依次复制到\alert{第三个参数指定的起始位置}
+		\end{block}
+	\end{columns}
+	\begin{yellowblock}{说明}
+		$\bullet$ fill函数前两个参数为迭代器范围（目的序列），第三个参数为写入值\\
+		$\bullet$ copy函数前两个参数表示输入范围，第三个迭代器表示目的序列的起始位置\\
+	\end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——算法概述}}
+\vspace{-3mm}
+	\begin{block}{重排型算法}
+		重新排列容器中的元素顺序
+	\end{block}
+\vspace{-3mm}
+	\begin{columns}[T]
+		\column{0.60\textwidth}
+		\begin{blueblock}{重排型算法案例1——sort}
+			\begin{lstlisting}[moreemph={T}]
+vector<int> v = { 3, 7, 3, 11, 3, 3, 2 };
+sort(v.begin(), v.end()); //升序排序
+            \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{重排型算法案例2——stable\_sort}
+			\begin{lstlisting}[moreemph={T}]
+stable_sort(v.begin(), v.end());
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.35\textwidth}
+		\begin{block}
+			{sort函数}
+			使输入序列中的元素有序，默认的元素比较方式为<运算符
+		\end{block}
+		\begin{block}
+			{stable\_sort函数}
+			与sort函数作用相同，但会\alert{保持相同元素的相对位置}
+		\end{block}
+	\end{columns}
+	\begin{redblock}{注意}
+		数值相等的元素的相对位置在使用sort排序后可能会改变\\
+	\end{redblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——算法概述}}
+\vspace{-3mm}
+	\begin{redblock}{注意}
+		如果容器元素是用户自定义类型，则需要提供元素的<运算符\\
+	\end{redblock}
+\vspace{-3mm}
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{重排型算法案例3——自定义<运算符}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={LargeData}]
+struct LargeData {
+    bool operator<(const LargeData rhs) {
+        return m_id < rhs.m_id; //比较对象的id
+    }//其它成员与11.2.4节相同
+};            \end{lstlisting}\vspace{-2mm}
+		\end{blueblock}
+		\begin{blueblock}{重排型算法案例3——sort}\vspace{-2mm}
+			\begin{lstlisting}[moreemph={LargeData}]
+vector<LargeData> vo;
+for (int i = 0; i < 50000; i++)
+    vo.emplace_back(rand() % 1000000);
+sort(vo.begin(), vo.end()); //按元素id的升序排序
+            \end{lstlisting}\vspace{-2mm}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}
+			{说明}
+			$\bullet$ \alert{自定义类型LargeData}有了定义的<运算符之后，方可使用sort进行排序
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\subsection{向算法传递函数}
+\begin{frame}[fragile]{11.3~泛型算法\small{——向算法传递函数}}
+	为了提高程序的效率，我们在11.2.4节中建议使用指针容器代替对象容器：
+	\begin{blueblock}{指针容器代替对象容器}
+		\vspace{-3mm}\begin{lstlisting}[moreemph={LargeData}]
+        vector<LargeData*> vp;
+    \end{lstlisting}
+	\end{blueblock}
+	由于sort算法将会按照\alert{指针大小排序}而不会对\alert{指针指向的对象}进行排序，所以我们需要\alert{定义自己的比较方式}。\\
+\pause
+	sort算法的第二版本的第三个参数接收一个\textbf{二元谓词}，即自定义比较方式。
+	\begin{block}
+		{谓词}
+		谓词是一个可以调用的表达式，其返回的结果能用于\alert{条件测试}。\\
+		标准库算法使用的谓词有两种：
+		\begin{itemize}
+			\item 一元谓词（unary predicate）：只接受一个参数
+			\item 二元谓词（binary predicate）：接受两个参数
+		\end{itemize}
+	\end{block}
+\pause
+	向算法传递可调用对象的三种方式：\textbf{使用函数}、\textbf{使用函数对象}和\textbf{使用lambda表达式}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——向算法传递函数}}
+	我们定义下面一个函数，该函数接受两个LargeData类型指针，比较的是指针指向的对象的id：\\
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用函数——定义待传递函数}
+			\begin{lstlisting}[moreemph={LargeData}]
+bool Less(const LargeData *a, const LargeData *b) {
+    return a->m_id < b->m_id;
+}
+            \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{使用函数——传递函数}
+			\begin{lstlisting}[moreemph={T}]
+sort(vp.begin(), vp.end(), Less);
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}
+			{说明}
+			$\bullet$ 左面代码执行完以后，vp中的元素将会按照id升序排列\\
+			$\bullet$ 当sort算法需要比较两个元素时，便会调用Less函数\\
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——向算法传递函数}}
+	我们还可以向算法传递一个函数对象\\
+	\begin{columns}[T]
+		\column{0.6\textwidth}
+		\begin{blueblock}{使用函数对象——定义类型}
+			\begin{lstlisting}[moreemph={LargeData}]
+struct Compare {
+    bool operator()(const LargeData *a, const LargeData *b) {
+        return a->m_id < b->m_id;
+    }
+};
+            \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{使用函数对象——传递对象}
+			\begin{lstlisting}[moreemph={T}]
+sort(vp.begin(), vp.end(), Compare());
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.35\textwidth}
+		\begin{yellowblock}
+			{说明}
+			$\bullet$ 上方代码为Compare类定义一个函数调用运算符，形参和功能与Less函数一样\\
+			$\bullet$ 下方sort函数调用中的第三个实参为通过Compare\alert{默认构造函数}创建的一个函数对象\\
+			$\bullet$ 函数对象可以\alert{保存调用时的状态}，相比于普通函数更为灵活\\
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——向算法传递函数*}}
+	函数对象可以\alert{保存调用时的状态}。相比于普通函数，函数对象更加灵活，能够完成函数不能完成的任务。下面我们通过Checker类和find\_if算法来查找容器中第n个元素：\\
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用函数对象——查找第n个元素}
+			\begin{lstlisting}[moreemph={T}]
+struct Checker{
+    int m_cnt = 0, m_nth;
+    Checker(int n) :m_nth(n) {}//初始化设定值
+    bool operator()(int) { return ++m_cnt == m_nth; }
+};
+            \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{使用函数对象——查找第n个元素}
+			\begin{lstlisting}[moreemph={T}]
+vector<int> v = { 3, 7, 3, 11, 3, 3, 2 };
+auto i=find_if(v.begin(),v.end(),Checker(4));//返回第4个元素的迭代器
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}
+			{说明}
+			$\bullet$ 两个数据成员分别用来计数（m\_cnt）和保存设定值（m\_nth）\\
+			$\bullet$ 每一次调用Checker对象，其计数器就会自增，当增加到设置值时，返回真\\
+			$\bullet$ 当调用返回真时，find\_if返回指向当前元素的迭代器\\
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——向算法传递函数}}
+一个lambda表达式为一个\alert{可调用的代码单元}，因此可以向算法传递lambda表达式
+	% \begin{columns}[T]
+	% 	\column{0.65\textwidth}
+	\begin{blueblock}{使用lambda表达式}
+		\begin{lstlisting}[moreemph={T,LargeData}]
+sort(vp.begin(), vp.end(), [](const LargeData *a, const LargeData *b) {return a->m_id < b->m_id;});
+            \end{lstlisting}
+	\end{blueblock}
+	% \column{0.3\textwidth}
+	\begin{yellowblock}
+		{说明}
+		$\bullet$ lambda表达式捕获列表为空, 函数形参为两个指针类型\\
+		$\bullet$ 函数体与Less函数和Compare函数调用运算符一样\\
+	\end{yellowblock}
+	% \end{columns}
+\pause
+	和上面两种方法相比，使用lambda表达式：
+	\begin{itemize}
+		\item 它\alert{不需要额外定义一个函数或一个函数对象类}
+		\item 可以利用捕获列表\alert{访问外围对象}
+	\end{itemize}
+	如果可调用对象的\alert{操作比较简单}且\alert{只在局部使用}，lambda表达式是最佳选择。
+\end{frame}
+
+\subsection{参数绑定}
+\begin{frame}[fragile]{11.3~泛型算法\small{——参数绑定*}}
+	有些标准库算法\alert{只接受一个包含一个参数的调用对象}，但有时候需要\alert{传递给算法的函数包含两个参数}。比如，通过filter函数将容器中小于一个给定值的元素设置为0
+	\begin{blueblock}{\texttt{filter}函数}
+		\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+void filter(int &a, int n) {
+    a = a < n ? 0 : a;
+}
+            \end{lstlisting}\vspace{-3mm}
+	\end{blueblock}
+	同时我们希望通过for\_each算法来遍历元素，但是该算法第三个参数接受只包含一个参数的可调用对象。此时我们可以通过lambda表达式来实现：
+
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{\texttt{filter}函数}
+			\vspace{-3mm}\begin{lstlisting}[moreemph={T}]
+vector<int> vi = { 3, 7, 1, 11, 3, 3, 2 };
+int n = 3;
+for_each(vi.begin(), vi.end(), [n](int &i) { i = (i < n ? 0 : i);});
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\only<1>{\begin{yellowblock}
+				{说明}
+				通过lambda捕获列表，我们可以从\alert{外部}设定n的值\\
+			\end{yellowblock}}
+		\only<2->{\begin{greenblock}
+				{问题}
+				如果坚持使用filter呢？\\
+			\end{greenblock}}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——参数绑定*}}
+	如果坚持用filter函数代替lambda表达式，可以使用标准库bind函数
+	\begin{columns}[T]
+		\column{0.55\textwidth}
+		\begin{blueblock}{\texttt{bind}使用格式}
+			\begin{lstlisting}[moreemph={T}]
+auto newFun = bind (fun, arg_list);
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.4\textwidth}
+		\begin{block}
+			{bind函数}
+			bind函数接受一个可调用对象，生成一个新的可调用对象来仿造原调用对象的参数列表。\\
+		\end{block}
+	\end{columns}
+	\begin{yellowblock}
+		{说明}
+		$\bullet$ \texttt{fun}是一个已定义的调用对象， \texttt{newFun}是\texttt{fun}的仿造者\\
+		$\bullet$ \texttt{arg\_list}是\texttt{fun}的参数列表\\
+		$\bullet$ \texttt{arg\_list}可能包含一些名为\texttt{\_n}的参数，他们是\texttt{newFun}的参数，\texttt{n}的值表示在\texttt{newFun}参数列表中的位置。\\
+		$\bullet$ 当我们调用\texttt{newFun}时，\texttt{newFun}会调用\texttt{fun}，并把\texttt{arg\_list}中的参数传递给\texttt{fun}。\\
+	\end{yellowblock}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——参数绑定*}}
+	下面我们根据filter函数仿造一个新的调用对象uf：
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{使用bind——根据filter仿造新对象uf}
+			\begin{lstlisting}[moreemph={T}]
+auto uf = bind(filter, std::placeholders::_1, n);
+            \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{使用bind——调用for\_each}
+			\begin{lstlisting}[moreemph={T}]
+for_each(vi.begin(), vi.end(), uf);
+        \end{lstlisting}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{yellowblock}
+			{说明}
+			$\bullet$ 仿函数uf包含一个参数\_1\\
+			$\bullet$ 调用uf时，将参数\_1和参数n传递给filter函数\\
+			$\bullet$ 调用for\_each 时，给定的元素传递给uf，uf将这个元素和n 传递给filter\\
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法\small{——参数绑定*}}
+	默认情况下，bind函数中\alert{不是占位符的参数}将以\alert{拷贝}的方式传递给可调用对象。如果需要\alert{传递引用}，可以使用标准库函数\textbf{ref}：
+	\begin{columns}[T]
+		\column{0.6\textwidth}
+		\begin{blueblock}{使用bind——传递引用}
+			\begin{lstlisting}[moreemph={T}]
+void sum(int a, int &s){
+    s += a;
+}
+            \end{lstlisting}
+		\end{blueblock}
+		\begin{blueblock}{使用bind——传递引用}
+			\begin{lstlisting}[moreemph={T}]
+int s = 0; //保存累加和
+for_each(vi.begin(), vi.end(), bind(sum, std::placeholders::_1, std::ref(s)));
+            \end{lstlisting}
+		\end{blueblock}
+		\column{0.35\textwidth}
+		\begin{yellowblock}
+			{说明}
+			$\bullet$ sum将第一个函数的值累加到与形参s绑定的实参中\\
+			$\bullet$ ref函数返回一个包含s的引用的对象\\
+		\end{yellowblock}
+		\begin{redblock}
+			{提示}
+			标准库functional提供类似ref的cref函数，其返回包含\alert{const引用类型}的对象
+		\end{redblock}
+	\end{columns}
+\end{frame}
+
+\subsection{使用function}
+\begin{frame}[fragile]{11.3~泛型算法——\small{使用function}}
+	前述内容中用于LargeData对象比较的调用对象，例如函数、函数对象、bind函数创建的对象等等虽然使用方式不同但都具有\alert{相同的调用形式}：
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{用于比较的可调用对象的形式}
+			\begin{lstlisting}[moreemph={LargeData}]
+bool(LargeData*, LargeData*)
+            \end{lstlisting}
+		\end{blueblock}
+		%         \only<2->{\begin{blueblock}{使用function2}
+		% 			\begin{lstlisting}[moreemph={T}]
+		% LargeData a(0), b(1);
+		% if (f1(&a, &b)) {/*...*/}
+		% if (f2(&a, &b)) {/*...*/}
+		% if (f3(&a, &b)) {/*...*/}
+		% if (f4(&a, &b)) {/*...*/}
+		%             \end{lstlisting}
+		% 		\end{blueblock}}
+		\column{0.3\textwidth}
+		\begin{yellowblock}
+			{说明}
+			该\alert{调用形式}是一个函数类型，接受两个LargeData指针类型的形参，返回值为bool\\
+		\end{yellowblock}
+		% \only<2->{\begin{yellowblock}
+		% 	{说明}
+		% 	$\bullet$ 使用新创建的function对象对上面4种不同的调用对象实现统一的使用方式
+		% \end{yellowblock}}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{11.3~泛型算法——\small{使用function}}
+	我们可以将前述不同表现形式的对象用\textbf{function类模板}统一起来：
+	\begin{columns}[T]
+		\column{0.65\textwidth}
+		\begin{blueblock}{定义function对象}
+
+			\vspace{-2mm}\begin{lstlisting}[moreemph={T}]
+using CallType = bool(LargeData*, LargeData*);
+function<CallType> f1 = Less; //函数
+function<CallType> f2 = Compare(); //函数对象
+function<CallType> f3 = [](const LargeData *a, const LargeData *b) {return a->m_id < b->m_id; }; //lambda
+function<CallType> f4 = //bind函数
+bind(Less, std::placeholders::_2, std::placeholders::_1);
+            \end{lstlisting}\vspace{-2mm}
+		\end{blueblock}
+		\begin{blueblock}{使用function对象}
+            \vspace{-2mm}
+            \begin{tikzpicture}[overlay]
+              \draw[red,dashed, line width=1pt] (4.7,-0.7)--(4.7,-1.5);
+            \end{tikzpicture}
+			\begin{lstlisting}[moreemph={T}]
+LargeData a(0), b(1);
+if (f1(&a, &b)) {/*...*/}           if (f2(&a, &b)) {/*...*/}
+if (f3(&a, &b)) {/*...*/}           if (f4(&a, &b)) {/*...*/}
+                \end{lstlisting}
+            \vspace{-2mm}
+		\end{blueblock}
+		\column{0.3\textwidth}
+		\begin{block}
+			{funcion}
+			\alert{通用多态函数封装器}，其实例能存储、复制及调用任何\alert{可调用 (Callable) 目标}
+		\end{block}
+		\begin{yellowblock}
+			{说明}
+			使用CallType类型统一了各种形式的调用\\
+		\end{yellowblock}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[c]{~}
+	\begin{center}
+		\huge{本章结束}
+	\end{center}
+\end{frame}
+
+\end{document}
