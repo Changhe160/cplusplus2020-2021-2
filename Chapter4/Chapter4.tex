@@ -1576,7 +1576,10 @@ for (auto p = &a2d[0][0]; p < a2d[0] + 15; ++p) {
 	\frametitle{4.5 \texttt{string}类型}
 	% \framesubtitle{——if 语句}
 	\begin{abstractblock}{\texttt{string}类型是\texttt{C++}标准库类型}
-		支持变长的字符串和常用的字符串操作。
+		支持变长的字符串和常用的字符串操作，使用时包含string头文件
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+#include <string>
+                \end{lstlisting}
 	\end{abstractblock}
 	\begin{abstractblock}{\texttt{using}声明}
 		如下声明来引入单个名字:
@@ -1610,7 +1613,7 @@ string str5(5, 'R');        //直接初始化，str5 的内容为 RRRRR
 	\begin{block}{\texttt{string}对象的输入和输出}
 		\begin{lstlisting}[basicstyle=\small\ttfamily]
 string s;
-cin >> s;    //遇到空白字符停止
+cin >> s;    //遇到空格符、制表符和回车符等空白字符停止
 cout << s; //输出s的内容
                 \end{lstlisting}
 		利用\texttt{getline}函数读取空白字符：

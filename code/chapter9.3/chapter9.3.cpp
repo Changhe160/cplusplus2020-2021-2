@@ -120,7 +120,7 @@ int main() {
 	Shape *p;
 	//cout << p->area() << endl;
 	Circle c1(1), c2(2);
-	
+
 	Square s1(1), s2(2);
 	p = &s1;
 	cout << p->area() << endl;
