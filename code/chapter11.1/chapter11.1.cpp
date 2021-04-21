@@ -111,9 +111,6 @@ void sum(int a, int &s) {
 }
 
 int main() {
-
-
-
 	vector<int> vi = { 1,2,3,4 };
 	if (auto p = Find(vi, 4))
 		cout << *p << endl;

@@ -1,5 +1,5 @@
 %!TEX program = xelatex
-\documentclass[aspectratio=169,UTF8,10pt]{ctexbeamer}
+\documentclass[aspectratio=169,UTF8,11pt]{ctexbeamer}
 
     \mode<presentation> {
     \usetheme{Madrid}
@@ -102,6 +102,7 @@
 
 
 \begin{frame}{目录}
+\vspace{-3mm}
 \begin{multicols}{2}
   \tableofcontents
 \end{multicols}
@@ -154,13 +155,30 @@
 
 \begin{frame}
     {5.1 认识函数}
-    \begin{block}{函数}
+\begin{columns}
+\column{0.55\textwidth}
+\centering
+\fbox{\includegraphics[scale=0.23]{八皇后}}
+
+\column{0.43\textwidth}
+    这样的程序设计方法有没有问题？
+    \begin{block}<2->{所有代码都在主函数中}
+   \begin{itemize}
+     \item  可读性差；
+     \item  逻辑分析困难；
+     \item 调试困难；
+     \item 代码无法复用；
+   \end{itemize}
+    \end{block}
+
+    \begin{block}<3->{函数}
    具有名字的语句块。
    \begin{itemize}
      \item  通过调用函数的名字可以执行相应的代码块；
      \item  模块化程序设计的基础。
    \end{itemize}
     \end{block}
+    \end{columns}
 \end{frame}
 
 \subsection{定义函数}
@@ -207,10 +225,10 @@ int maximum(int a, int b) { //被调函数
      c=a > b ? a : b;
      return c;
 }
-int main() {            //主调函数
+int main() {                    //主调函数
     int x, y, z;
     cin >> x >> y;
-                        //调用函数maximum
+                                //调用函数maximum
     z = maximum(x, y);  //x和y为实际参数((*@\alert{简称实参}@*))
     cout << "The maximum value is " << z << endl;
     return 0;
@@ -221,7 +239,7 @@ int main() {            //主调函数
 
 \column{0.4\textwidth}
 %        \begin{column}{0.4\textwidth}
-函数调用过程（如下）：
+调用过程（F11进入被调函数）：
 
             \begin{figure}[ht]
                 \centering
@@ -430,7 +448,7 @@ int maximum(int a, int b) {
 \begin{frame}[fragile]
     {5.2 认识函数\small{~---~存储周期}}
 \begin{block}{自动存储周期}
-定义在函数体或语句块内部的对象（包括函数的形参）。在程序执行到其定义的位置时创建，离开其作用域时被释放，在\alert{栈}（stack\index{S!stack}）区分配存储空间。
+定义在\alert{函数体或语句块内部的对象（包括函数的形参）}。在程序执行到其定义的位置时创建，离开其作用域时被释放，在\alert{栈}（stack\index{S!stack}）区分配存储空间。
 \end{block}
 
 \begin{block}<2->{静态存储周期}
@@ -441,8 +459,8 @@ int maximum(int a, int b) {
 \begin{block}<3->{动态存储周期}
 利用运算符~\textcolor{blue}{new}~生成的对象具有动态存储周期，可利用运算符~\textcolor{blue}{delete}~释放其内存空间，存储周期从~\textcolor{blue}{new}~操作开始，到~\textcolor{blue}{delete}~操作结束，在\alert{堆}（heap\index{H!heap}）区分配存储空间。
 \end{block}
-\begin{block}<4->{线程存储周期}
-为了支持并行程序设计，\alert{C++11}~引入了~\textcolor{blue}{thread\_local}~关键字。存储周期在其所在的线程创建时开始，线程结束时结束。
+\begin{block}<4->{线程存储周期*}
+为了支持并行程序设计，\alert{C++11}~引入了~\textcolor{blue}{thread\_local}~关键字。
 \end{block}
 \end{frame}
 
@@ -478,7 +496,10 @@ int maximum(int a, int b) {
 \end{itemize}
 \end{block}
 \begin{blueblock}<2->{使用自动对象的例子}
-\vspace{-1.5mm}\begin{lstlisting}
+\vspace{-1.5mm}
+\begin{columns}
+\column{0.45\textwidth}
+\begin{lstlisting}
 void fun(float x) { //x和t均为局部自动对象
     int t = x + 5;
     cout << "t=" << t << endl;
@@ -488,7 +509,12 @@ int main() {
     cout << "t=" << t << endl;
     fun(t);
 }
-\end{lstlisting}\vspace{-1.5mm}
+\end{lstlisting}
+\column{0.45\textwidth}
+\centering
+\includegraphics[scale=0.5]{functioncall.png}
+\end{columns}
+\vspace{-1.5mm}
 \end{blueblock}
 \end{frame}
 
@@ -502,7 +528,10 @@ int main() {
   \item<3-> \alert{如果内置类型的局部静态对象没有提供初始值，则初始化为0}
 \end{itemize}
 \end{block}
-\begin{blueblock}<4->{请问程序输出结果？}\vspace{-1.5mm}\begin{lstlisting}
+\begin{blueblock}<4->{请问程序输出结果？}\vspace{-1.5mm}
+\begin{columns}
+\column{0.55\textwidth}
+\begin{lstlisting}
 int fun() {
     int a = 0;              //a为局部自动对象
     static int b = 0;       //b为局部静态对象
@@ -512,11 +541,17 @@ int main() {
     for (int i = 0; i < 3; ++i)
          cout << fun() << endl;
 }
-\end{lstlisting}\vspace{-1.5mm}
+\end{lstlisting}
+\column{0.35\textwidth}
+\centering
 \begin{itemize}
   \item<5->[]
   结果为：2 3 4
 \end{itemize}
+\end{columns}
+
+\vspace{-1.5mm}
+
 \end{blueblock}
 
 \end{frame}
@@ -552,8 +587,8 @@ int main() {
 \begin{block}{链接性（linkage\index{L!linkage}）：在作用域外部的可见性（共享性）}
 \begin{itemize}
   \item<2-> 局部对象没有链接性，不能共享；
-  \item<3-> 全局对象具有外部链接性\text{（external linkage\index{E!external linkage}）}，可在文件间共享；
-  \item<4-> ~\textcolor{blue}{static}~修饰的全局对象具有内部链接性（internal linkage\index{I!internal linkage}） ，只能由同一个文件中的函数共享。
+  \item<3-> 全局对象具有外部链接性，可在文件间共享；
+  \item<4-> ~\textcolor{blue}{static}~修饰的全局对象具有内部链接性 ，只能由同一个文件中的函数共享。
 \end{itemize}
 \end{block}
 \begin{columns}
@@ -566,12 +601,10 @@ int g_val = 10;
 \end{blueblock}
 \column{0.45\textwidth}
 \begin{blueblock}<5->{main.cpp}\vspace{-1.5mm}\begin{lstlisting}
-extern int g_val;
-//gs_val内部链接性
+extern int g_val; //gs_val内部链接性
 static int gs_val = 20;
 int main() {
     cout << g_val + gs_val;
-    return 0;
 }
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
@@ -607,11 +640,14 @@ int main() {
 \begin{block}{普通值传递}
 将实参的值拷贝给形参。
 \begin{itemize}
-  \item 非引用类型；
-  \item 改变形参的值，不会影响到实参。
+  \item 安全：改变形参的值，不会影响到实参；
+  \item 效率低：有时空代价。
 \end{itemize}
 \end{block}
-\begin{blueblock}<2->{普通值传递的例子}\vspace{-1.5mm}\begin{lstlisting}
+\begin{blueblock}<2->{普通值传递的例子}\vspace{-1.5mm}
+\begin{columns}
+\column{0.65\textwidth}
+\begin{lstlisting}
 void Swap(int x, int y) {
      int z(x);
      x = y;
@@ -619,10 +655,15 @@ void Swap(int x, int y) {
 }
 int main() {
     int i(4), j(5);
-    Swap(i, j);         //调用Swap函数，实参i和j分别初始化Swap函数的形参x和y
+    Swap(i, j);
     cout << "i=" << i << ",j=" << j << endl;//输出i=4,j=5
 }
-\end{lstlisting}\vspace{-1.5mm}
+\end{lstlisting}
+
+\column{0.3\textwidth}
+\includegraphics[scale=0.08]{swap.png}
+\end{columns}
+\vspace{-1.5mm}
 \end{blueblock}
 
 \end{frame}
@@ -647,14 +688,11 @@ int main() {
 \begin{blueblock}{代码清单5.1，例5.1}\vspace{-1.5mm}\begin{lstlisting}
 ...
 bool is_palindrome(int x);              //函数声明
-
 int main() {
     for (int i = 10; i <= 1000; ++i) {
-        if (is_palindrome(i))
-            cout << i << endl;
+        if (is_palindrome(i))    cout << i << endl;
     }
 }
-
 bool is_palindrome(int x) {
     vector<int> digit;                  //存放x的每一位数字
     while (x != 0) {
@@ -803,14 +841,14 @@ int main() {
 
 \begin{frame}[fragile]
     {5.3.3 参数传递\small{~---~const~形参}}
-    \begin{block}{兼顾效率与安全}
+    \begin{block}{const~形参：兼顾效率与安全}
 \begin{itemize}
   \item 避免内容的拷贝：高效性；
   \item 不能通过形参改变实参：安全性。
 \end{itemize}
 \end{block}
-\begin{block}<2->{const~形参}
-~const~修饰的形参名字和~const~修饰的对象名字的含义相同。
+\begin{block}<2->{const~形参定义}
+const~修饰的形参名字和~const~修饰的对象名字的含义相同。
 \end{block}
 \begin{blueblock}<3->{请问以下~const~修饰的形参名字的含义}\vspace{-1.5mm}\begin{lstlisting}
 void f_cval(const int i);
@@ -822,19 +860,19 @@ void f_cref(const int &i);
 \end{frame}
 \begin{frame}[fragile]
     {5.3.3 参数传递\small{~---~const~形参}}
-    \begin{block}{兼顾效率与安全}
+    \begin{block}{const~形参：兼顾效率与安全}
 \begin{itemize}
   \item 避免内容的拷贝：高效性；
   \item 不能通过形参改变实参：安全性。
 \end{itemize}
 \end{block}
-\begin{block}{const~形参}
-~const~修饰的形参名字和~const~修饰的对象名字的含义相同。
+\begin{block}{const~形参定义}
+const~修饰的形参名字和~const~修饰的对象名字的含义相同。
 \end{block}
 \begin{blueblock}{请问以下~const~修饰的形参名字的含义}\vspace{-1.5mm}\begin{lstlisting}
-void f_cval(const int i);   //i 为 const 对象
-void f_cptr(const int *i);  //i 指向 const 类型的实参
-void f_cref(const int &i);  //i 为 const 类型实参的引用
+void f_cval(const int i);       //i 为 const 对象
+void f_cptr(const int *i);      //i 指向 const 类型的实参
+void f_cref(const int &i);      //i 为 const 类型实参的引用
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
 
@@ -844,7 +882,7 @@ void f_cref(const int &i);  //i 为 const 类型实参的引用
 \begin{frame}[fragile]
     {5.3.3 参数传递\small{~---~const~形参}}
 
-\begin{blueblock}<2->{非const引用形参}
+\begin{blueblock}<1->{非const引用形参}
 \begin{itemize}
  \item 非const引用形参不能接受字面值常量、表达式的求值结果、需要转换的对象或者~const~对象。
 \end{itemize}
@@ -858,7 +896,7 @@ f_ref(cx);              //错误：左值引用不能绑定常量
 f_ref(x+1);             //错误：左值引用不能绑定右值表达式
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
-\begin{redblock}<3->{建议}
+\begin{redblock}<2->{建议}
 尽量使用引用形参，需要的时候使用指针形参
 \end{redblock}
 \end{frame}
@@ -867,17 +905,18 @@ f_ref(x+1);             //错误：左值引用不能绑定右值表达式
 \subsection{数组形参}
 \begin{frame}[fragile]
     {5.3 参数传递\small{~---~数组形参}}
+    \vspace{-2mm}
 \begin{columns}
-\column{0.45\textwidth}
+\column{0.48\textwidth}
 \begin{block}{数组的特点}
 \begin{itemize}
   \item 不可复制；
   \item 指针化。
 \end{itemize}
 \end{block}
-\column{0.45\textwidth}
+\column{0.48\textwidth}
 \begin{block}<2->{数组形参}
-通常使用指针的方式来传递首元素的地址。
+通常使用指针的方式来传递首元素的地址。\\~
 \end{block}
 \end{columns}
 \begin{blueblock}<3->{示例}\vspace{-1.5mm}\begin{lstlisting}
@@ -885,13 +924,14 @@ void fun(int *p);
 void fun2(int p[]);//等价于上式，数组的方式
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
+  \vspace{-2mm}
 \begin{blueblock}<4->{调用方式}\vspace{-1.5mm}\begin{lstlisting}
 int arr[5] = {1, 2};
 fun(arr);               //正确：数组名转化为首元素的地址
 fun(&arr[0]);           //正确：显式传递首元素的地址
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
-
+  \vspace{-2mm}
 \begin{redblock}<5->{传递的是数组首元素的地址，编译器不会检查数组的大小}
 \vspace{-1.5mm}\begin{lstlisting}
 void fun(int p[5]);     //“指明”数组的长度，无用
@@ -899,23 +939,22 @@ void fun(int p[5]);     //“指明”数组的长度，无用
 \end{redblock}
 \end{frame}
 
-
 \begin{frame}[fragile]
     {5.3.3 参数传递\small{~---~数组形参}}
 \begin{blueblock}<1->{显式传递数组的长度}\vspace{-2.5mm}\begin{lstlisting}
 void print(char *str, unsigned size) {
-    for (unsigned i = 0; i < size; ++i)
-        cout << str[i];
+    for (unsigned i = 0; i < size; ++i)        cout << str[i];
 }
 \end{lstlisting}
-\vspace{-1.5mm}
+\vspace{-2mm}
 \end{blueblock}
 %\vspace{-2em}
+\vspace{-2mm}
 \begin{columns}
 \column{0.48\textwidth}
 \begin{blueblock}<2->{使用标记位来识别数组长度}\vspace{-1.5mm}\begin{lstlisting}
 void print(char *str) {
-    if (str) //如果str不是一个空指针
+    if (str)            //如果str不是一个空指针
         while (*str) //当前指针指向非空字符
             cout << *str++; //输出当前指针指向的字符并指向下一个字符
 }
@@ -927,12 +966,12 @@ void print(char *str) {
 \column{0.48\textwidth}
 \begin{blueblock}<3->{利用指针标明访问范围}\vspace{-1.5mm}\begin{lstlisting}
 void print(char *beg, char * end) {
-    //输出beg和end之间的元素（包含beg但不包含end指向的元素）
+    //输出[beg,end)之间的元素
     while (beg != end)
          cout << *beg++; //输出当前指针指向的字符并指向下一个字符
 }
     char arr[] = "Hello C++";
-    print(begin(arr), end(arr));
+    print(std::begin(arr), std::end(arr));
 \end{lstlisting}\vspace{-1.5mm}
 ~begin~和~end~函数可以获取数组的首元素和尾后元素的地址。
 \end{blueblock}
@@ -1002,6 +1041,7 @@ void Swap(int &x, int &y) {
     int z(x);
     x = y;
     y = z;
+
 }
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
@@ -1049,7 +1089,7 @@ void Swap(int &x, int &y) {
 \begin{block}{值返回}
 通过拷贝返回值的方式将结果传递给主调函数。
 \begin{itemize}
-  \item 简单、 安全、 效率低。
+  \item 简单、 安全、\alert{效率低}。
 \end{itemize}
 \end{block}
 \begin{blueblock}<2->{值返回示例}
@@ -1195,27 +1235,25 @@ int& maximum(int a, int b) {
 把同一作用域下具有相同名字但不同形参列表的一组函数称为重载（overloaded\index{O!overloaded function}）函数，这些函数执行相似的操作。
 \end{block}
 \begin{columns}
-\column{0.45\textwidth}
+\column{0.6\textwidth}
 \begin{blueblock}<2->{示例}
 \vspace{-2.5mm}\begin{lstlisting}
-const int& getMax(const int &a, const int &b) {
+const int& getMax(const int &a, const int &b){
     return a > b ? a : b;
 }
-const int& getMax(const int &a, const int &b, const int &c) {
+const int& getMax(const int &a, const int &b, const int &c){
     return a > b ? (a > c ? a : c) : (b > c ? b : c);
 }
-const string& getMax(const string &a, const string &b) {
+const string& getMax(const string &a, const string &b){
     return a > b ? a : b;
 }
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
-\column{0.45\textwidth}
+\column{0.38\textwidth}
 \begin{block}<3->{最佳匹配的原则}
-\begin{itemize}
-  \item 如果有精确匹配的函数，则调用此函数；否则选择实参与形参类型最接近的转换函数；
-  \item 如果有一个以上无法区分的匹配，则会出现二义性调用（ambiguous call\index{A!ambiguous call}）错误；
-  \item 如果找不到任何一个与实参相匹配的函数，则会出现无匹配错误。
-\end{itemize}
+$\bullet$ 如果有精确匹配的函数，则调用此函数；否则选择实参与形参类型最接近的转换函数；\\
+$\bullet$ 如果有一个以上无法区分的匹配，则会出现二义性调用错误；\\
+$\bullet$ 如果找不到任何一个与实参相匹配的函数，则会出现无匹配错误。
 \end{block}
 \end{columns}
 \end{frame}
@@ -1271,6 +1309,7 @@ turnoff(22); //提供实参，接受实参值
 \vspace{-2.5mm}\begin{lstlisting}
 void turnoff(int time = getTime());
 \end{lstlisting}\vspace{-1.5mm}
+getTime()根据是否是工作日返回关机时间
 \end{blueblock}
 \end{frame}
 
@@ -1289,9 +1328,9 @@ void print(int a = 1, int b = 2, int c = 3);
 
 \begin{greenblock}<3->{答案}
 \vspace{-2.5mm}\begin{lstlisting}
-void print(int a, int b, int c = 3); //正确：部分参数具有默认值
-void print(int a, int b = 2, int c); //错误：最右侧参数没有默认值
-void print(int a = 1, int b = 2, int c = 3); //正确：所有参数具有默认值
+void print(int a, int b, int c = 3);            //正确：部分参数具有默认值
+void print(int a, int b = 2, int c);            //错误：最右侧参数没有默认值
+void print(int a = 1, int b = 2, int c = 3);    //正确：所有参数具有默认值
 \end{lstlisting}\vspace{-1.5mm}
 \end{greenblock}
 \end{frame}
@@ -1306,7 +1345,7 @@ void print(int a = 1, int b = 2, int c = 3); //正确：所有参数具有默认
     \begin{block}{函数优缺点}
 \begin{itemize}
   \item 优点：函数的使用体现了模块化程序设计思想，降低了程序设计的复杂性；
-  \item 不足：函数调用，比如执行流的转移操作、参数传递、返回值处理等，需要时间和空间的开销。
+  \item 不足：函数调用中执行流的转移、参数传递、返回值处理等，需要时空开销。
 \end{itemize}
 \end{block}
 \begin{blueblock}<2->{示例}
@@ -1316,7 +1355,7 @@ inline void Swap(int &x, int &y){ /*...*/ }
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
 \begin{block}<3->{减少开销}
-编译器将在调用处嵌入内联函数的代码，不会发生函数调用，因而也不会产生函数调用的开销了。
+编译器将在调用处嵌入函数代码，不会发生函数调用，因而也没有函数调用开销。
 \end{block}
 \begin{redblock}<4->{注意}
 对于编译器来说，inline~关键字只是一个建议。通常为使用频率高的简单函数。另外，内联函数放在头文件中。
@@ -1343,29 +1382,26 @@ inline void Swap(int &x, int &y){ /*...*/ }
 
 \begin{frame}[fragile]
     {5.5 函数重载和特殊用途的函数\small{~---~内联函数}}
-\vspace{-1em}
+\vspace{-0.5em}
 \begin{blueblock}{利用冒泡排序法将容器中的学生成绩排序}
+\vspace{-1.5mm}
 \begin{lstlisting}
 inline void Swap(int &x, int &y) {
     int z(x);
     x = y;
     y = z;
 }
-
 int main() {
     srand(0);
     vector<int> score(10);
     for (auto &i : score)   i = rand() % 100;
-
     for (int i = score.size()-1; i >=0; --i) {
         for (int j = 0; j < i;++j) {                //每一轮冒泡过程将最大的数浮出来（右边）
              if (score[j+1] < score[j])             //相邻的两个数比较
                  Swap(score[j+1], score[j]);
         }
     }
-
     for (auto &i : score)        cout << i << endl;
-
 }
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
@@ -1535,8 +1571,8 @@ bool b2 = (*pf2)(1, 2);
 \vspace{-2.5mm}\begin{lstlisting}
 using pFun = double(*)(double);
 
-double f_sphere(double x) {    return x*x;      }
 double f_default(double x) {        return 0;   }
+double f_sphere(double x) {    return x*x;      }
 double f_sin(double x) {    return sin(x);      }
 
 double integrate(double l, double u, pFun pf = f_default, int n = 1000) {
@@ -1546,7 +1582,6 @@ double integrate(double l, double u, pFun pf = f_default, int n = 1000) {
         sum += (gap / 2.0) * (pf(l + i*gap) + pf(l + (i + 1)*gap));
     return sum;
 }
-
 int main() {
     cout<<"默认函数在区间[0:1]上的积分为："<<integrate(0, 1) << endl;
     cout<<"Sphere函数在区间[0:1]上的积分为："<<integrate(0, 1, f_sphere)<<endl;
@@ -1658,8 +1693,7 @@ lambda~可以捕获外围作用域内的局部对象，而且还可以指定捕�
 int divisor = 5;
 vector<int> numbers{ 1, 2, 3, 4, 5, 10, 15, 20, 25, 35, 45, 50 };
 for_each(numbers.begin(), numbers.end(), [divisor](int y) {     //divisor为外围divisor的拷贝
-    if (y % divisor == 0)
-        cout << y << endl;//输出被divisor整除的元素
+    if (y % divisor == 0)     cout << y << endl;
 });
 \end{lstlisting}\vspace{-1.5mm}
 divisor 作为副本在函数体内部使用
@@ -1669,10 +1703,9 @@ divisor 作为副本在函数体内部使用
 \vspace{-2.5mm}\begin{lstlisting}
 int sum = 0;
 
-for_each(numbers.begin(), numbers.end(), [divisor, &sum](int y) { //sum为外围sum 的引用
-    if (y % divisor == 0)
+for_each(numbers.begin(), numbers.end(), [divisor, &sum](int y) { //sum为外围sum的引用
+    if (y % divisor == 0)   
         sum += y;
-    //累加被divisor整除的元素，结果存放到外围对象sum中
 });
 
 \end{lstlisting}\vspace{-1.5mm}
@@ -1797,9 +1830,6 @@ int main() {
 \column{0.65\textwidth}
 \begin{blueblock}<1->{汉诺塔问题}
 \vspace{-2.5mm}\begin{lstlisting}
-#include<iostream>
-using namespace std;
-
 void hanoi(int n, char src, char mid, char tar) {
     if (n == 1)
         cout << src << "->" << tar << '\t';
@@ -1866,8 +1896,8 @@ int main() {
 
 \begin{frame}[fragile]
     {5.7 递归调用\small{~---~递归和循环}}
-%\vspace{-1em}
-\begin{blueblock}<1->{代码清单5.6，例5.6}
+\vspace{-1em}
+\begin{blueblock}<1->{}
 \vspace{-2.5mm}\begin{lstlisting}
 bool isSafe(int i, const vector<int> &que) {
     for (int k = 0; k < i; ++k)
@@ -1886,8 +1916,7 @@ void queen(int i, vector<int> &que, int &cnt) {
     }
 }
 int main() {
-    int sz(8), cnt(0);
-    vector<int> que(sz);
+    int cnt(0);   vector<int> que(8);
     queen(0, que, cnt);
 }
 \end{lstlisting}\vspace{-1.5mm}
@@ -1917,6 +1946,7 @@ int main() {
 \subsection{宏定义}\label{chap5-8-1}
 \begin{frame}[fragile]
     {5.8 编译预处理和多文件结构\small{~---~宏定义}}
+    \vspace{-1.5mm}
 \begin{block}{宏定义}
 \begin{itemize}
   \item 宏定义指令为~\#define；
@@ -1924,6 +1954,7 @@ int main() {
   \item 分为带参和不带参两种。
 \end{itemize}
 \end{block}
+\vspace{-1.5mm}
 \begin{columns}
 \column{0.4\textwidth}
 \begin{block}<2->{1.不带参宏定义}
@@ -1952,7 +1983,7 @@ void testFun() {
 \end{block}
 
 \end{columns}
-\begin{redblock}<4->{建议：尽量使用~const~对象和内联函数}
+\begin{redblock}<4->{}{建议：尽量使用~const~对象和内联函数}
 \end{redblock}
 \end{frame}
 
@@ -2113,7 +2144,7 @@ int main() {
 \column{0.8\textwidth}
 \begin{block}{作业本}
  \begin{enumerate}
-   \item 习题5.6、5.9和5.17
+   \item 习题5.6、5.9和5.10
  \end{enumerate}
 \end{block}
 

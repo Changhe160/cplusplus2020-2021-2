@@ -361,7 +361,7 @@ cout << i / j << endl;
          \end{center}
         \end{columns}
         \end{blueblock}
- \pause       
+ \pause
     \textbf{异常处理（exception handling）}允许将\alert{异常检测和解决的过程分离开来}，程序中某一个模块出现了异常不会导致整个程序无法正确运行。
     \pause
     \begin{block}{C++ 语言异常内部处理机制使用的三个关键字}
@@ -437,7 +437,7 @@ try{
 catch (const char *str) {
     //捕获一个C风格字符串常量对象
     //任何能够被char *接受的异常都将被捕获
-    cerr << "捕获异常" << str << endl; 
+    cerr << "捕获异常" << str << endl;
     //cerr为标准错误ostream对象
 }
         \end{lstlisting}
@@ -503,7 +503,7 @@ catch (const char *str) {
     C++标准库提供了\textbf{标准异常类（standard exception）}，使用时需要包含头文件exception。
     其继承关系如图：
     \begin{figure}
-        \includegraphics[scale=0.4]{Fig12-1.png}
+        \includegraphics[scale=0.5]{Fig12-1.png}
     \end{figure}
     \begin{block}
         {基类exception}
@@ -519,8 +519,8 @@ catch (const char *str) {
             {自定义版本的what成员}
             \begin{lstlisting}[moreemph={T}]
 struct MyException :public exception {
-    const char* what() const noexcept { 
-        return "Ooops!"; 
+    const char* what() const noexcept {
+        return "Ooops!";
     }
 };
         \end{lstlisting}
@@ -919,7 +919,7 @@ map<char, function<unique_ptr<Operator>()>> ms_operator;
         \begin{blueblock}
             {类注册机制核心数据结构}
             \begin{lstlisting}[moreemph={Plus}]
-ms_operator.emplace('+',[]() { return make_unique<Plus>(); 
+ms_operator.emplace('+',[]() { return make_unique<Plus>();
 });
 \end{lstlisting}
         \end{blueblock}
@@ -964,7 +964,7 @@ unique_ptr<Operator> oo = ms_operator['+']();
            \vspace{-3mm} \begin{lstlisting}[basicstyle=\scriptsize, moreemph={Factory,RegisterClass,Operator}]
 class Factory{
 public:
-template<typename T> 
+template<typename T>
 struct RegisterClass {
     RegisterClass(char opr) {
         Factory::ms_operator.emplace(opr,[]{return make_unique<T>();});
