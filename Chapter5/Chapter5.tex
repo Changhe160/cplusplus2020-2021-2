@@ -1616,7 +1616,7 @@ int *&p3 = p2[0];
 \vspace{-2.5mm}\begin{lstlisting}
 void(*a[5])(int);
 void(*(*b)[5])(int);
-void(*c(int, void(*fp)(int)))(int);
+void(*c(int, void(*)(int)))(int);
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
 \end{columns}
@@ -1690,10 +1690,10 @@ lambda~可以捕获外围作用域内的局部对象，而且还可以指定捕�
 \column{0.48\textwidth}
 \begin{blueblock}<2->{按值捕获特定的外围对象}
 \vspace{-2.5mm}\begin{lstlisting}
-int divisor = 5;
-vector<int> numbers{ 1, 2, 3, 4, 5, 10, 15, 20, 25, 35, 45, 50 };
-for_each(numbers.begin(), numbers.end(), [divisor](int y) {     //divisor为外围divisor的拷贝
-    if (y % divisor == 0)     cout << y << endl;
+int d = 5;
+vector<int> ns{ 1, 2, 3, 4, 5, 10, 15, 20, 25, 35, 45, 50 };
+for_each(ns.begin(), ns.end(), [d](int y) {     //d为外围d的拷贝
+    if (y % d == 0)     cout << y << endl;
 });
 \end{lstlisting}\vspace{-1.5mm}
 divisor 作为副本在函数体内部使用
@@ -1703,8 +1703,8 @@ divisor 作为副本在函数体内部使用
 \vspace{-2.5mm}\begin{lstlisting}
 int sum = 0;
 
-for_each(numbers.begin(), numbers.end(), [divisor, &sum](int y) { //sum为外围sum的引用
-    if (y % divisor == 0)   
+for_each(ns.begin(), ns.end(), [d, &sum](int y) { //sum为外围sum的引用
+    if (y % d == 0)   
         sum += y;
 });
 

@@ -42,7 +42,7 @@ int main() {
 		{
 			void(*a[5])(int);
 			void(*(*b)[5])(int)=nullptr;
-			void(*c(int, void(*fp)(int)))(int);
+			void(*c(int, void(*)(int)))(int);
 			using PF = void(*)(int);
 
 			PF a1[5] = { a[0] };
