@@ -1,5 +1,5 @@
 %!TEX program = xelatex
-\documentclass[aspectratio=169,UTF8,10pt]{ctexbeamer}
+\documentclass[aspectratio=169,UTF8,11pt]{ctexbeamer}
 
     \mode<presentation> {
     \usetheme{Madrid}
@@ -193,8 +193,8 @@
 \begin{columns}
 \column{0.6\textwidth}
  \vspace{-1em}
-\begin{blueblock}<2->{分数类}
- \vspace{-0.1em}\begin{lstlisting}
+\begin{blueblock}<2->{}
+ \vspace{-1.5mm}\begin{lstlisting}
 class Fraction (*@{\color{red}\{}@*)
     //数据成员，访问控制属性默认是私有
     int m_numerator = 0;        // 分子默认为0； C++11
@@ -285,10 +285,7 @@ a.value()--> value(&a);
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
 
-\begin{block}<4->{this~指针}
-\begin{itemize}
-  \item 指向调用成员函数对象的\alert{const指针（指针常量）}，运行代码演示
-\end{itemize}
+\begin{block}<4->{this~指针:指向调用成员函数对象的\alert{const指针（指针常量）}，运行代码演示}
  \vspace{-0.5em}\begin{lstlisting}
 double Fraction::value(){
     return static_cast<double>(this->m_numerator) / this->m_denominator;
@@ -659,7 +656,7 @@ Fraction b(a);          //直接初始化，b 为对象 a 的拷贝
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
 
-\begin{blueblock}<2->{定义形式}
+\begin{blueblock}<2->{}
  \vspace{-2.5mm}\begin{lstlisting}
 class Fraction {
 public:
@@ -840,18 +837,16 @@ Employee e2(e1);                                //错误：复制构造函数是
 
 \begin{greenblock}{以下代码会输出什么？}
 \vspace{-2.5mm}\begin{lstlisting}
-Fraction::Fraction(const Fraction &rhs) : m_numerator(rhs.m_numerator), m_denominator(rhs.m_denominator) {
-    cout<< "Copy constructor called" << endl;
-}
+Fraction::Fraction(const Fraction &rhs) : m_numerator(rhs.m_numerator), m_denominator(rhs.m_denominator) { cout<< "Copy constructor called" << endl; }
 Fraction c2 = Fraction(3, 2);
 \end{lstlisting}\vspace{-1.5mm}
 \end{greenblock}
 \begin{block}<2->{复制优化}
-C++~编译器使用一种名为\alert{拷贝去除}（copy ellision\index{C!constructor!copy ellision}）的优化技术：创建临时对象和调用拷贝构造函数这两个过程完全可以用直接初始化的方式来完成。
+\alert{拷贝去除}技术：创建临时对象和调用拷贝构造函数这两个过程用直接初始化的方式来完成。
 \end{block}
 
 \begin{greenblock}<3->{使用引用提高代码性能}
-\vspace{-1.5mm}
+\vspace{-2mm}
 \begin{lstlisting}
 Fraction divide(const Fraction &dividend, const Fraction &divisor) {
     return Fraction(divident.numerator()*divisor.denominator(),divident.denominator()*divisor.numerator());//返回值优化
@@ -872,13 +867,12 @@ Fraction e = divide(b, c); //调用divide函数过程中Fraction类构造函数�
 \begin{block}{析构函数（destructor\index{D!destructor}）}
 \begin{itemize}
   \item 触发：一个对象生命期结束时，编译器会自动调用；
-  \item 功能：销毁对象的所有成员；
-  \item 语法：名字由\alert{波浪号}紧接类名构成，不能有返回值，也不能包含形参。
+  \item 功能：销毁对象的所有成员，释放内存；
 \end{itemize}
 \end{block}
-\begin{blueblock}{示例}
+\begin{blueblock}{语法：名字由\alert{波浪号}紧接类名构成，不能有返回值，也不能包含形参}
  \vspace{-2.5mm}\begin{lstlisting}
- class Fraction {
+class Fraction {
 public:
     ~Fraction() { } //析构函数
 };
@@ -899,17 +893,15 @@ public:
     {6.2.3 析构函数}
 \begin{columns}
 \column{0.65\textwidth}
-\begin{block}{构造函数和析构函数的调用}
+\begin{block}{构造函数和析构函数的调用次序}
  \vspace{-2.5mm}\begin{lstlisting}
 class Point {
     double m_x = 0, m_y = 0;
 public:
-    Point(double x=0,double y=0):m_x(x),m_y(y) {
-        cout << "Constructor of Point" << endl;
-    }
-    Point(const Point &p) :m_x(p.m_x), m_y(p.m_y) {
-        cout << "Copy constructor of Point" << endl;
-    }
+    Point(double x=0,double y=0):m_x(x),m_y(y) 
+    { cout << "Constructor of Point" << endl; }
+    Point(const Point &p) :m_x(p.m_x), m_y(p.m_y) 
+    { cout << "Copy constructor of Point" << endl; }
     ~Point() { cout << "Destructor of Point" << endl; }
 };
 class Circle {
@@ -954,7 +946,6 @@ ostream& print(ostream &out, const Fraction &f) {
     out << f.m_numerator << "/" << f.m_denominator;
     return out;
 }
-
 Fraction obj ;
 print(cout, obj);
 \end{lstlisting}\vspace{-1.5mm}
@@ -1089,6 +1080,7 @@ a.operator *= (b); //与 a *= b 等价
 \subsection{重载原则}
 \begin{frame}[fragile]
     {6.3.2 重载原则}
+     \vspace{-1.5mm}
 \begin{block}{1.~含义与内置类型一致}
  \vspace{-2.5mm}\begin{lstlisting}
  bool operator==(const Fraction &left, const Fraction &right) {
@@ -1096,16 +1088,17 @@ a.operator *= (b); //与 a *= b 等价
 }
 \end{lstlisting}\vspace{-1.5mm}
 \end{block}
+ \vspace{-1.5mm}
 \begin{block}<2->{2.~行为与内置类型一致}
  \vspace{-2.5mm}\begin{lstlisting}
 Fraction& Fraction::operator=(const Fraction &rhs) {            //返回左值对象的引用
     if (&rhs == this) return *this;                             //不会给自己赋值，例如， a = a;
-    m_numerator = rhs.m_numerator;    m_denominator = rhs.m_denominator;
+    m_numerator = rhs.m_numerator;          m_denominator = rhs.m_denominator;
     return *this;
 }
 \end{lstlisting}\vspace{-1.5mm}
 \end{block}
-
+ \vspace{-1.5mm}
 \begin{yellowblock}<3->{编译器会自动合成一个默认的赋值运算符}
 \begin{itemize}
   \item 参数与返回值类型与上述函数一致；
@@ -1307,6 +1300,7 @@ int main() {
 \subsection{递增和递减运算符}
 \begin{frame}[fragile]
     {6.3.4 递增和递减运算符}
+     \vspace{-1.5mm}
 \begin{blueblock}{递增运算符的声明}
  \vspace{-2.5mm}\begin{lstlisting}
 class Fraction {
@@ -1316,6 +1310,7 @@ public:
 };
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
+ \vspace{-1.5mm}
 \begin{columns}
 \column{0.48\textwidth}
 \begin{blueblock}<2->{前置递增}
@@ -1324,7 +1319,6 @@ Fraction& Fraction::operator++() {
     ++m_numerator;               //分子加1
     return *this;                //返回调用对象的引用
 }
-//
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
 \column{0.48\textwidth}
@@ -1338,7 +1332,7 @@ Fraction Fraction::operator++(int) {
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
 \end{columns}
-
+ \vspace{-1.5mm}
 \begin{greenblock}<4->{示例}
  \vspace{-2.5mm}\begin{lstlisting}
     Fraction a(1, 5);       //直接初始化
@@ -1358,13 +1352,14 @@ Fraction Fraction::operator++(int) {
 \begin{columns}
 \column{0.5\textwidth}
 \begin{blueblock}<2->{示例：利用函数调用运算符设置分子分母}
+ \vspace{-2.5mm}
 \begin{lstlisting}
 class Fraction {
 public:
     const Fraction& operator()(int a, int b) {
         m_numerator = a;
         m_denominator = b;
-        return *this;       //返回调用对象的const引用
+        return *this;       
     }
 };
 Fraction f;
@@ -1400,8 +1395,7 @@ cout<<f<<endl;          //输出3/5
 \begin{frame}[fragile]
     {6.4.1 声明静态成员}
 
-\begin{blueblock}<1->{示例：声明静态成员}
-利用关键字~ \textcolor{blue}{static}~为~Fraction~类添加静态成员
+\begin{blueblock}<1->{示例：利用关键字~ \textcolor{blue}{static}~为~Fraction~类添加静态成员}
 \begin{lstlisting}
 class PartTimeWorker {
     string m_name;                  //员工姓名
@@ -1414,7 +1408,7 @@ public:
 };
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
-
+ \vspace{-1.5mm}
 \begin{block}<2->{说明}
 \begin{itemize}
   \item 在成员声明之前加上关键字~ \textcolor{blue}{static}~使其与类相关联；
@@ -1452,18 +1446,18 @@ class PartTimeWorker {               //其他成员省略
 double PartTimeWorker::ms_payRate = 7.53;
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
-
+\vspace{-1.5mm}
 \begin{blueblock}<2->{定义静态成员：在类内部提供初始值} \vspace{-2.5mm}
 \begin{lstlisting}
 class PartTimeWorker {                           //其它成员与前面一致
     static const int ms_maxHourWeek = 20;       //每周最长工作时间
 };
-const int PartTimeWorker::ms_maxHourWeek;       //在类内部已经有了初始值，则在类外部不可以再提供初始值
+const int PartTimeWorker::ms_maxHourWeek;       //在类内部已有初始值，在类外部不可以再提供初始值
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
-
+\vspace{-1.5mm}
 \begin{blueblock}<3->{定义静态成员：可以在类内部也可以在类外部定义静态成员函数}
-静态成员函数~initRate~在类外的定义：
+\vspace{-1.5mm}
 \begin{lstlisting}
 void PartTimeWorker::initRate(double rate) {
     ms_payRate = rate;
