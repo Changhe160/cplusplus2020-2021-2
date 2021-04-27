@@ -285,7 +285,7 @@ a.value()--> value(&a);
 \end{lstlisting}\vspace{-1.5mm}
 \end{blueblock}
 
-\begin{block}<4->{this~指针:指向调用成员函数对象的\alert{const指针（指针常量）}，运行代码演示}
+\begin{block}<4->{this~指针:指向调用成员函数对象的\alert{const指针}，运行代码演示}
  \vspace{-0.5em}\begin{lstlisting}
 double Fraction::value(){
     return static_cast<double>(this->m_numerator) / this->m_denominator;
@@ -482,8 +482,8 @@ ostream& print(ostream &out, const Fraction &f) {
     {6.2.1 构造函数}
 \begin{block}<1->{构造函数}
 \begin{itemize}
-  \item 在对象创建时为数据成员执行\alert{初始化}操作；
-  \item 只要创建类类型对象，就会执行类的构造函数。
+  \item 调用：创建类类型对象会触发类的构造函数；
+  \item 作用：为待创建的对象数据成员执行\alert{初始化}操作。
 \end{itemize}
 \end{block}
 
@@ -495,8 +495,23 @@ ostream& print(ostream &out, const Fraction &f) {
 \end{itemize}
 \end{block}
 
-\end{frame}
+\begin{block}<3->{}
+\begin{columns}
+\column{0.45\textwidth}
+\begin{lstlisting}
+class Fraction {
+public:
+   Fraction()  {}
+};
+\end{lstlisting}
+\column{0.45\textwidth}
+\begin{lstlisting}
+Fraction a;
+\end{lstlisting}
+\end{columns}
 
+\end{block}
+\end{frame}
 
 
 \begin{frame}[fragile]
@@ -606,7 +621,7 @@ Fraction(int above, int below){
   \item 按照数据成员声明顺序依次执行初始化操作。
 \end{itemize}
 \end{block}
-\begin{blueblock}<2->{示例}
+\begin{blueblock}{示例}
 \begin{lstlisting}
 class Fraction {
     int m_numerator = 0;
@@ -615,7 +630,7 @@ public：
     Fraction(int above, int below) : m_numerator(above), m_denominator(below) {}
 }
 \end{lstlisting}
-\onslide<3->{思考：什么情况必须用初始化列表？}
+\onslide<2->{思考：什么情况必须用初始化列表？}
 \end{blueblock}
 
 \end{frame}
@@ -811,7 +826,21 @@ Fraction e = divide(b, c);
 \end{columns}
 \end{frame}
 
+\begin{frame}[fragile]
+    {6.2.2 复制构造函数\small{~---~复制优化}}
 
+\begin{greenblock}{使用引用提高代码性能}
+
+\begin{lstlisting}
+Fraction divide(const Fraction &dividend, const Fraction &divisor) {
+    return Fraction(divident.numerator()*divisor.denominator(),divident.denominator()*divisor.numerator());//返回值优化
+}
+Fraction b(2,3), c(4,5);
+Fraction e = divide(b, c); //调用divide函数过程中Fraction类构造函数调用几次？
+\end{lstlisting}
+\end{greenblock}
+
+\end{frame}
 
 \begin{frame}[fragile]
     {6.2.2 复制构造函数\small{~---~阻止复制}}
@@ -830,34 +859,6 @@ Employee e2(e1);                                //错误：复制构造函数是
 \end{greenblock}
 
 \end{frame}
-
-
-\begin{frame}[fragile]
-    {6.2.2 复制构造函数\small{~---~复制优化}}
-
-\begin{greenblock}{以下代码会输出什么？}
-\vspace{-2.5mm}\begin{lstlisting}
-Fraction::Fraction(const Fraction &rhs) : m_numerator(rhs.m_numerator), m_denominator(rhs.m_denominator) { cout<< "Copy constructor called" << endl; }
-Fraction c2 = Fraction(3, 2);
-\end{lstlisting}\vspace{-1.5mm}
-\end{greenblock}
-\begin{block}<2->{复制优化}
-\alert{拷贝去除}技术：创建临时对象和调用拷贝构造函数这两个过程用直接初始化的方式来完成。
-\end{block}
-
-\begin{greenblock}<3->{使用引用提高代码性能}
-\vspace{-2mm}
-\begin{lstlisting}
-Fraction divide(const Fraction &dividend, const Fraction &divisor) {
-    return Fraction(divident.numerator()*divisor.denominator(),divident.denominator()*divisor.numerator());//返回值优化
-}
-Fraction b(2,3), c(4,5);
-Fraction e = divide(b, c); //调用divide函数过程中Fraction类构造函数调用几次？
-\end{lstlisting}\vspace{-1.5mm}
-\end{greenblock}
-
-\end{frame}
-
 
 
 \subsection{析构函数}
@@ -898,9 +899,9 @@ public:
 class Point {
     double m_x = 0, m_y = 0;
 public:
-    Point(double x=0,double y=0):m_x(x),m_y(y) 
+    Point(double x=0,double y=0):m_x(x),m_y(y)
     { cout << "Constructor of Point" << endl; }
-    Point(const Point &p) :m_x(p.m_x), m_y(p.m_y) 
+    Point(const Point &p) :m_x(p.m_x), m_y(p.m_y)
     { cout << "Copy constructor of Point" << endl; }
     ~Point() { cout << "Destructor of Point" << endl; }
 };
@@ -1359,7 +1360,7 @@ public:
     const Fraction& operator()(int a, int b) {
         m_numerator = a;
         m_denominator = b;
-        return *this;       
+        return *this;
     }
 };
 Fraction f;
