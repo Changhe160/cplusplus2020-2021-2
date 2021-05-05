@@ -1114,9 +1114,9 @@ Fraction& Fraction::operator=(const Fraction &rhs) {            //返回左值�
 \begin{block}{3.~成员函数的选择}
 类成员函数还是类的辅助函数：
 \begin{itemize}
-  \item 赋值（=）、下标（[]）、函数调用（()）和成员访问箭头（->）运算符必须是类成员；
-  \item 改变运算对象自身状态的运算符应该是类成员，比如复合赋值、自增、自减运算符等；
-  \item 具有对称性的运算符一般应作为类的辅助函数，比如算术、关系、逻辑运算符等。
+  \item \alert{赋值（=）、下标（[]）、函数调用（()）和成员访问箭头（->）}运算符必须是类成员；
+  \item \alert{改变运算对象自身状态}的运算符应该是类成员，比如复合赋值、自增、自减运算符等；
+  \item \alert{具有对称性}的运算符一般应作为类的\alert{辅助函数}，比如算术、关系、逻辑运算符等。
 \end{itemize}
 \end{block}
 \end{frame}
@@ -1127,7 +1127,7 @@ Fraction& Fraction::operator=(const Fraction &rhs) {            //返回左值�
 \begin{yellowblock}<1->{提示}
 \begin{itemize}
   \item<1-> 如果运算符作为类的成员函数，左侧对象一定是该类类型对象；
-  \item<2-> 含有类类型的混合类型表达式，运算符应该定义成辅助函数，通常定义为\alert{友元函数}。
+  \item<2-> 含有类类型的混合类型表达式，运算符应该定义成辅助函数，通常定义为友元函数。
 \begin{lstlisting}
 class Fraction {
     friend Fraction operator/(int left, const Fraction &right);
@@ -1212,16 +1212,14 @@ ostream& operator <<  (ostream &os, const Fraction &a) {
     os << a.m_numerator << a.m_denominator;
     return os;
 }
-\end{lstlisting}\vspace{-1.5mm}
+\end{lstlisting}\vspace{-2mm}
 \end{block}
 
-\begin{yellowblock}<3->{必须返回~ostream~类对象的引用}
-
-\onslide<4-> 与运算符\texttt{<<}行为一致（连续输出）；不允许复制IO类对象
+\begin{yellowblock}<3->{必须返回~ostream~类对象的引用，不允许复制IO类对象}
 \begin{lstlisting}
 Fraction a, b;
 cout << a << b << endl;
-\end{lstlisting}\vspace{-1.5mm}
+\end{lstlisting}\vspace{-2mm}
 
 \end{yellowblock}
 
@@ -1254,7 +1252,7 @@ istream& operator >>  (istream &is, Fraction &a) {
 \begin{frame}[fragile]
     {6.3.3 输入和输出运算符}
     \begin{itemize}
-      \item 输入/输出运算符必须为类的辅助函数，不能作为类的成员函数，例如
+      \item 输入/输出运算符必须为类的辅助函数，不宜作为类的成员函数，例如
     \end{itemize}
 \begin{greenblock}<1->{下面程序是否有问题？ }
 \begin{lstlisting}
@@ -1291,8 +1289,6 @@ int main() {
     a.operator>>(cin);      //类的成员函数的调用方式或者a>>cin
     return 0;
 }
-
-
 \end{lstlisting}\vspace{-1.5mm}
 \end{greenblock}
 
@@ -1302,7 +1298,7 @@ int main() {
 \begin{frame}[fragile]
     {6.3.4 递增和递减运算符}
      \vspace{-1.5mm}
-\begin{blueblock}{递增运算符的声明}
+\begin{blueblock}{}
  \vspace{-2.5mm}\begin{lstlisting}
 class Fraction {
 public:
