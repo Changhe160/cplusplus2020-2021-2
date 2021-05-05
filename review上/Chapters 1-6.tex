@@ -1,0 +1,362 @@
+%!TEX program = xelatex
+\documentclass[aspectratio=169,UTF8,11pt]{ctexbeamer}
+
+    \mode<presentation> {
+    \usetheme{Madrid}
+    %\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+    \setbeamertemplate{footline}[frame number] % To replace the footer line in all slides with a simple slide count uncomment this line
+    \setbeamercolor{page number in head/foot}{fg=blue}
+    \setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+    }
+    \usepackage{indentfirst}
+    \setlength{\parindent}{2em}
+    \usepackage{listings}
+    \lstset{language=C++, showstringspaces=false, basicstyle=\small}
+    \usepackage{wrapfig}
+    \usepackage{graphicx}
+    % \usepackage{fboxrule}
+\definecolor{hanblue}{rgb}{0.27, 0.42, 0.81}
+\definecolor{indiagreen}{rgb}{0.07, 0.53, 0.03}
+\definecolor{indianred}{rgb}{0.8, 0.36, 0.36}
+\definecolor{indianyellow}{rgb}{0.89, 0.66, 0.34}
+\definecolor{babypink}{rgb}{0.96, 0.76, 0.76}
+\definecolor{ao(english)}{rgb}{0.0, 0.5, 0.0}
+
+    \definecolor{azure(colorwheel)}{rgb}{0.0, 0.5, 1.0}
+    \definecolor{alizarin}{rgb}{0.82, 0.1, 0.26}
+    % User Defined Block %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+    \newenvironment<>{blueblock}[1]{%
+      \setbeamercolor{block title}{fg=white,bg=hanblue}%
+    %   \setbeamercolor{block body}{fg=white,bg=bondiblue}%
+      \begin{block}#2{#1}}{\end{block}}
+
+    \newenvironment<>{greenblock}[1]{%
+    % \setbeamercolor{block title}{fg=white,bg=bondiblue}%
+      \setbeamercolor{block title}{fg=white,bg=indiagreen}%
+    \begin{block}#2{#1}}{\end{block}}
+
+    \newenvironment<>{redblock}[1]{%
+      \setbeamercolor{block title}{fg=white,bg=indianred}%
+    %   \setbeamercolor{block body}{fg=white,bg=bondiblue}%
+      \begin{block}#2{#1}}{\end{block}}
+
+    \newenvironment<>{yellowblock}[1]{%
+      \setbeamercolor{block title}{fg=white,bg=indianyellow}%
+      \begin{block}#2{#1}}{\end{block}}
+
+    \lstset{language=C++,
+    columns=flexible,
+    basicstyle=\footnotesize\ttfamily,                                    % 设定代码字体、大小
+    %numbers=left,xleftmargin=2em,framexleftmargin=2em,                   % 在左侧显示行号
+    %numberstyle=\color{darkgray},                                        % 设定行号格式
+    keywordstyle=\color{blue},                                            % 设定关键字格式
+    commentstyle=\color{ao(english)},                                     % 设置代码注释的格式
+    stringstyle=\color{brown},                                            % 设置字符串格式
+    showstringspaces=false,                                              % 控制是否显示空格
+    %frame=single,                                                         % 控制外框
+    breaklines,                                                           % 控制是否折行
+    % postbreak=\space,                                                     % 控制折行后显示的标识字符
+    breakindent=5pt,                                                      % 控制折行后缩进数量
+    emph={size\_t,array,deque,list,map,queue,set,stack,vector,string,pair,tuple,ostream,istream}, % 非内置类型
+    emphstyle={\color{teal}},
+    escapeinside={(*@}{@*)},
+}
+
+\usepackage{multicol}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+
+
+\title[\textit{C++程序设计：总结上}]{总结与复习：第1-6章} % The short title appears at the bottom of every slide, the full title is only on the title page
+
+%\author[李长河]{李长河} % Your name
+%\institute[CUG] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+%{
+%中国地质大学（武汉）\\ % Your institution for the title page
+%\medskip
+%\textit{lichanghe@cug.edu.cn} % Your email address
+%}
+\date{} % Date, can be changed to a custom date
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	TIKZ FLOWCHART
+%----------------------------------------------------------------------------------------
+%\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=2cm, minimum height=0.5cm, text centered, draw=black, fill=red!30, font=\tiny]
+%\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=0cm, minimum height=0cm, text centered, draw=black, fill=blue!30, font=\tiny]
+%\tikzstyle{process} = [rectangle, minimum width=2.5cm, minimum height=1.5cm, text centered, draw=black, fill=orange!30, font=\tiny, text width=2cm]
+%\tikzstyle{decision} = [diamond, minimum width=2.5cm, minimum height=2cm, text centered, draw=black, fill=green!30, font=\tiny, text width=1.8cm, aspect=1.1]
+
+\begin{frame}
+\titlepage % Print the title page as the first slide
+
+\begin{multicols}{2}
+\begin{itemize}
+	\item 黑色部分：基础知识，掌握	
+    \item \alert{红色部分：关键知识，运用}	
+	\item \color{blue}{蓝色部分：高级话题，了解}
+\end{itemize}
+\end{multicols}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{第一章：认识C++程序}
+\begin{multicols}{2}
+\begin{itemize}
+  \item 程序基本组成
+  \item main函数：有且仅有1个main函数
+\item 注释语句：单行注释与多行注释
+\item 输入输出：std::cin, std::cout
+\item \alert{编译与调试：提高编程能力的唯一途径}
+\begin{lstlisting}
+while(存在语法错误){
+    编辑-编译;
+}
+
+do{
+    编辑–编译–调试;
+}while{逻辑错误}
+\end{lstlisting}\vspace{-1.5mm}
+\end{itemize}
+\end{multicols}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+	\frametitle{第二章：基本数据类型和表达式}
+\begin{multicols}{2}
+\begin{itemize}
+  \item 基本元素：用户自定义标示符和关键字
+\item 基本数据类型
+\begin{itemize}
+  \item 内置类型：含义和尺寸（字节）
+  \item 字面值常量（右值）：整型常量、实型常量和字符常量（转义字符）的表示方法（前缀和后缀）
+\end{itemize}
+
+\item 对象：数据和操作的载体
+\begin{itemize}
+  \item 定义和初始化，声明
+  \item 类型、名字、\textcolor{blue}{内存结构}、\alert{生命期}、作用域
+\end{itemize}
+
+\item const修饰符和类型推导
+\begin{itemize}
+  \item const对象和\textcolor{blue}{constexpr}
+  \item 类型别名：using或typedef
+  \item {\color{blue}类型推导：auto和decltype}
+\end{itemize}
+
+\item 表达式求值与构造
+\begin{itemize}
+  \item {\color{blue}左值、右值}、运算符、\alert{优先级、结合性}和{\color{blue}求值次序}
+  \item 优先级：逗号运算符\texttt{<}赋值运算符~\texttt{<}逻辑或\texttt{<}逻辑与~\texttt{<}~关系运算符~\texttt{<}~算术运算符~\texttt{<}~逻辑非
+      \item 条件运算符、sizeof运算符、\textcolor{blue}{位运算符}
+  \item 表达式构造，\alert{短路求值}，隐式类型转换规则
+\end{itemize}
+\end{itemize}
+\end{multicols}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{第三章：语句控制结构}
+\begin{multicols}{2}
+\begin{itemize}
+  \item 语句：分号结束的表达式语句
+\begin{itemize}
+  \item 空语句和语句块
+  \item 语句作用域
+\end{itemize}
+
+\item 分支结构
+\begin{itemize}
+  \item if语句，if else语句，if嵌套，\alert{悬垂else}
+  \item switch语句：标签, \alert{break语句}
+\end{itemize}
+\item 循环结构
+\begin{itemize}
+ \item 循环语句：while, do while和for语句的执行流程
+ \item \alert{循环语句选择}
+\end{itemize}
+\item 跳转语句
+\begin{itemize}
+ \item \alert{break}只能用于循环或switch语句；
+ \item \alert{continue}只能用于循环结构
+\end{itemize}
+\item \alert{嵌套结构}：根据问题分析设计
+\end{itemize}
+\end{multicols}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{第四章：复合类型、string和vector}
+
+\begin{multicols}{2}
+\begin{itemize}
+  \item （左值）引用：左值对象的别名
+\begin{itemize}
+  \item 定义时必须初始化
+  \item \alert{const与引用：兼顾安全与效率}
+  \item {\color{blue}auto, decltype和引用}
+  \item {\color{blue}右值引用：把右值变成左值}
+\end{itemize}
+
+\item 指针：通过对象的地址访问对象内容
+\begin{itemize}
+  \item 指针对象：存储左值对象的地址
+  \item 赋值操作改变指针指向
+  \item 指向const对象的指针，const指针
+  \item {\color{blue}auto, decltype和指针}
+  \item {\color{blue}void指针和多级指针}
+  \item \alert{指针和引用}：初始化、赋值行为不同；引用可以看做const指针
+\end{itemize}
+
+\item 数组：有限个同类型元素的有序集合
+\begin{itemize}
+  \item 初始化（字符数组的特殊性）
+  \item {\color{blue}复杂数组定义}
+  \item 下标法访问；{\color{blue}范围for语句}
+  \item 二维数组:int a[5][5];
+\end{itemize}
+
+\item \alert{指针和数组}：利用指针访问数组（地址、元素和值）
+\begin{itemize}
+  \item 指针指向数组
+  \item 指向数组的指针运算：移动、关系和减法
+  \item 访问数组：
+        int (*p2d)[5] = a; *(*(p2d+1)+1),*(p2d[1]+1)
+\end{itemize}
+
+\item string、vector和{\color{blue}枚举类型}
+\item {\color{blue}C风格字符数组的处理函数}
+\end{itemize}
+\end{multicols}
+\end{frame}
+
+
+\begin{frame}[fragile]
+	\frametitle{第五章：函数}
+\begin{multicols}{2}
+\begin{itemize}
+  \item 函数：代码间数据传递和交互的主要方式
+\begin{itemize}
+  \item 函数四个要素
+  \item 函数声明与函数定义
+  \item 函数调用过程
+\end{itemize}
+
+\item 存储类型
+\begin{itemize}
+  \item 局部对象：栈，无链接性
+  \item 全局对象：全局数据区，外部链接性
+  \item 静态类型：无外部链接性
+\end{itemize}
+
+\item \alert{参数传递}
+\begin{itemize}
+  \item 单向值传递，安全但低效 Swap(int,int);
+  \item 地址传递：传递实参的地址 Swap(int *, int*);
+  \item 引用传递：形参与实参指向同一个存储空间 Swap(int\&,int\&);
+  \item 兼顾效率与安全： const 引用
+  \item 数组形参：地址方式传递，需要传递数组长度（字符数组例外）
+\end{itemize}
+
+\item\alert{返回值类型}
+\begin{itemize}
+  \item 值返回：右值临时对象
+  \item 引用或地址返回：左值（在函数调用之前产生），不要返回函数内部在栈里产生的局部对象的引用或地址
+\end{itemize}
+\item {\color{blue}{函数重载、形参默认值、内联函数、函数指针、lambda表达式}}
+\item {\color{blue}{递归程序设计}}
+\item 编译预处理和多文件结构
+\begin{itemize}
+  \item 宏定义：带参和不带参
+  \item {\color{blue}{条件编译}}
+  \item 多文件结构：\alert{头文件和源文件}
+\end{itemize}
+
+\end{itemize}
+\end{multicols}
+\end{frame}
+
+
+\begin{frame}[fragile]
+	\frametitle{第六章：类}
+\begin{multicols}{2}
+\begin{itemize}
+  \item 类的定义
+  \begin{itemize}
+    \item 成员的抽象与\alert{封装}
+    \begin{lstlisting}
+class Fraction {
+private: 数据成员;
+public: 成员函数;
+};
+\end{lstlisting}
+    \item 成员函数调用 ：. ->
+    \item 访问控制和友元
+  \end{itemize}
+  \item \alert{构造与析构：控制对象生命期}
+  \begin{itemize}
+    \item 构造函数：语法和功能，初始化列表
+    \item 默认与复制构造函数：直接与复制初始化
+    \item 析构函数：语法和功能
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item 运算符重载
+  \begin{itemize}
+    \item \alert{重载原则}：含义和行为与内置类型一致；改变自身状态的作为类成员，对称性的作为辅助函数
+    \item 输入和输出运算符：辅助函数，注意返回值和参数类型
+    \item \color{blue}{递增和递减运算符：成员函数，注意行为与内置类型一致}
+    \item \color{blue}{函数调用和类型转换运算符}
+  \end{itemize}
+ \item 静态成员
+\begin{itemize}
+  \item 静态数据成员类内声明类外初始化
+  \item 静态成员函数不能访问非静态数据成员
+  \item 类名::成员名
+\end{itemize}
+ \item class Fraction \{\};是空类吗？
+\end{itemize}
+\end{multicols}
+\end{frame}
+
+
+\begin{frame}[fragile]
+	\frametitle{算法设计与程序设计}
+\begin{block}{算法设计}
+\begin{multicols}{2}
+\begin{itemize}
+  \item 直接法：例3.2（成绩转换）、3.3（解方程）、3.5（字符统计）、3.6（猜数字）、3.8（石头剪刀布）、3.9（百钱买百鸡）、4.1（分数统计）、4.3（扫雷地图）、4.4（猜单词）
+  \item 迭代法：例3.4（计算$\pi$）、3.7（打印sin函数）
+  \item 回溯法（深度优先）：例4.2（八皇后）
+  \item 宽度优先：例4.5（扫雷连通域）
+  \item \textcolor{blue}{递归方法：例5.5（汉诺塔）、5.6（八皇后）}
+  \item 其它应用：例5.2（排序），5.3（求积分）
+\end{itemize}
+\end{multicols}
+\end{block}
+
+\begin{block}{程序设计模式}
+\begin{multicols}{2}
+\begin{itemize}
+  \item 面向过程
+  \item 基于对象
+  \item 面向对象
+  \item 泛型编程
+\end{itemize}
+\end{multicols}
+\end{block}
+\end{frame}
+
+\end{document}
